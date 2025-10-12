@@ -9,13 +9,13 @@ From Branch "Bellusci-SSD300-VGG16" of the original repo: "https://github.com/si
 
 ---
 
-#🎯 **Obiettivo della tesi**:
+# 🎯 Obiettivo della tesi:
 - Clonare e riorganizzare la repository esistente di training del modello SSD300.
 - Realizzare uno script di inference, che a partire da un modello addestrato produca bounding box, classi e confidenze sugli oggetti rilevati.
 - Integrare l’inference in un servizio backend che comunichi tramite MQTT.
 - Simulare il comportamento di un wearable (occhiali smart) tramite un client Docker con GUI minimale, che invii immagini al server e visualizzi le predizioni ricevute (immagine + box + classi + confidenze).
 
-#📂 **Struttura della repository (proposta)**
+# 📂 Struttura della repository (proposta)
 Dopo la riorganizzazione, la repository dovrà avere questa struttura modulare:
 
 project/
