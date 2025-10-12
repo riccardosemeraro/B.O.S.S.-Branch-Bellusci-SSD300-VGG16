@@ -31,3 +31,13 @@ project/<br>
 ├── docker/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # docker-compose con client, server e broker│ <br>
 ├── requirements.txt <br>
 └── README.md <br>
+
+---
+
+# Scaletta delle Fasi Operative
+- Studio delle Tecnologie Richieste (Modello SSD300, MQTT, ecc)
+- Riorganizzazione della repository GitHub
+- Realizzazione dello Script di Inferenza
+- Realizzazione di una GUI minimale per gli occhiali smart su client Docker
+- Integrazione dello Script di Inferenza realizzato in un backend che comunica con il client tramite MQTT
+- Realizzazione del frontend, testando la comunicazione client-server
