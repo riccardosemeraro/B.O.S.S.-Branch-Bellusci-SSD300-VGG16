@@ -34,7 +34,7 @@ project/<br>
 
 ---
 
-# Scaletta delle Fasi Operative
+# 📝 Scaletta delle Fasi Operative
 - Studio delle Tecnologie Richieste (Modello SSD300, MQTT, ecc)
 - Riorganizzazione della repository GitHub
 - Realizzazione dello Script di Inferenza
