@@ -20,14 +20,14 @@ From Branch "Bellusci-SSD300-VGG16" of the original repo: "https://github.com/si
 # 📂 Struttura della repository (proposta)
 Dopo la riorganizzazione, la repository dovrà avere questa struttura modulare:
 
-project/
-│
-├── training/
-├── inference/
-├── server/               # servizio che si sottoscrive al broker MQTT ed esegue inference
-├── client/               # simulazione wearable: invio immagine + GUI minimale
-├── broker/               # configurazione del broker MQTT (es. Mosquitto)
-├── saved_models/         # modelli addestrati salvati
-├── docker/               # docker-compose con client, server e broker│
-├── requirements.txt
-└── README.md
+project/<br>
+│<br>
+├── training/<br>
+├── inference/<br>
+├── server/               # servizio che si sottoscrive al broker MQTT ed esegue inference <br>
+├── client/               # simulazione wearable: invio immagine + GUI minimale <br>
+├── broker/               # configurazione del broker MQTT (es. Mosquitto) <br>
+├── saved_models/         # modelli addestrati salvati <br>
+├── docker/               # docker-compose con client, server e broker│ <br>
+├── requirements.txt <br>
+└── README.md <br>
