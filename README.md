@@ -15,17 +15,19 @@ From Branch "Bellusci-SSD300-VGG16" of the original repo: "https://github.com/si
 - Integrare l’inference in un servizio backend che comunichi tramite MQTT.
 - Simulare il comportamento di un wearable (occhiali smart) tramite un client Docker con GUI minimale, che invii immagini al server e visualizzi le predizioni ricevute (immagine + box + classi + confidenze).
 
+---
+
 # 📂 Struttura della repository (proposta)
 Dopo la riorganizzazione, la repository dovrà avere questa struttura modulare:
 
 project/
 │
-├── training/            
-├── inference/            
+├── training/
+├── inference/
 ├── server/               # servizio che si sottoscrive al broker MQTT ed esegue inference
 ├── client/               # simulazione wearable: invio immagine + GUI minimale
-├── broker/               # configurazione del broker MQTT (es. Mosquitto)   
+├── broker/               # configurazione del broker MQTT (es. Mosquitto)
 ├── saved_models/         # modelli addestrati salvati
 ├── docker/               # docker-compose con client, server e broker│
-├── requirements.txt      
+├── requirements.txt
 └── README.md
