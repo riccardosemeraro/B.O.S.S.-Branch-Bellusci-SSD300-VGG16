@@ -5,7 +5,13 @@ from torchvision.models.detection.ssd import SSDHead
 
 def create_ssd_model(num_classes, device):
     weights = SSD300_VGG16_Weights.COCO_V1
-    model = ssd300_vgg16(weights=weights)
+    #model = ssd300_vgg16(weights=weights)
+
+    # disattiva TUTTI i pesi
+    model = ssd300_vgg16(
+        weights=None,
+        weights_backbone=None
+    )
 
     num_anchors_list = model.anchor_generator.num_anchors_per_location()
     
