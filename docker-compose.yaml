@@ -1,0 +1,36 @@
+services:
+
+  # Broker MQTT per configurare la connessione
+  mqtt_broker:
+    image: eclipse-mosquitto:latest
+    container_name: mqtt_broker
+    volumes:
+      - ./broker/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+    ports:
+      - "1883:1883"
+    networks:
+      - boss_network
+
+  # Inference Server
+  inference_server:
+    build: ./inference # CARTELLA DOVE CERCA IL DOCKERFILE DA ESEGUIRE
+    container_name: inference_server # NOME CONTAINER
+    #depends_on:
+    #  - mqtt_broker
+    #environment:
+    #  - MQTT_BROKER=mqtt_broker # VARIABILI D'AMBIENTE
+    environment:
+      - DISPLAY=host.docker.internal:0    # Display X11 sul Mac
+      - QT_QPA_PLATFORM=xcb              # Forza Qt a usare XCB
+      - QT_X11_NO_MITSHM=1
+    volumes:
+      - ./saved_models:/app/saved_models # CREA DIRECTORY DEL CONTAINER, ASSOCIANDO <NOME_REALE>:<NOME_NEL_CONTAINER>
+      - ./training:/app/training # CREA DIRECTORY DEL CONTAINER, ASSOCIANDO <NOME_REALE>:<NOME_NEL_CONTAINER>
+      - ./inference:/app/inference
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    networks:
+      - boss_network # LO INSERISCE IN UN NETWORK DOVE COMUNICARE TRAMITE NOME CONTAINER E NON INDIRIZZO IP
+
+networks:
+  boss_network: # CREA LA RETE A LIVELLO GLOBALE
+    driver: bridge

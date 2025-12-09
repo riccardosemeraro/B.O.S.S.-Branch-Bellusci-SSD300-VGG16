@@ -1,0 +1,32 @@
+# Creare Ambiente VENV
+python3 -m venv .venv -> crea l'ambiente
+source .venv/bin/activate -> attiva l'ambiente
+deactivate -> esce dall'ambiente
+
+# GUI MAC DOCKER
+Idealmente converrebbe considerare l'hardware del mac come fosse l'hardware degli smart glasses, e creare i due
+container per il broker e per l'inference server.
+
+Eventualmente si voglia implementare la GUI dentro il container allora (necessaria connessione internet):
+1. brew install --cask xquartz
+2. Riavvia MAC
+3. Abilitare Connessioni client in Apri XQuartz -> Impostazioni -> Client Network
+3. sostituito nei requirements.txt opencv-python-headless==4.12.0.88 con opencv-python==4.12.0.88 per supporto X11
+4. xhost +localhost -> per aggiungere localhost come gui remoto
+5. docker-compose up
+
+# MQTT BROKER
+Per il broker MQTT è necessaria la creazione del file mosquitto.conf, aggiunto ai file del container, contenente i parametri:
+- listener 1883
+- allow_anonymous true
+Per abilitare su una specifica porta (1883) l'ascolto da parte di subscriber e publisher. Per il test, si è creato un
+docker-compose a parte che, dopo aver scritto sul topic la stringa "Ciao", viene ricevuta dal subscriber correttamente.
+Eventualmente si voglia prevedere un accesso alla rete autenticata, si può impostare su false allow_anonymous e configurare
+autenticazione con username/password (in fase di sviluppo non la ritengo necessaria)
+
+# INFERENCE CONTAINER
+Per scalare orizzontalmente le prestazioni, si può usare la versione "shared" di MQTT dove ci sono 3 container
+di inferenza e 1 "client", in questo modo uno per volta a rotazione un server di inferenza risponderà al frame
+ricevuto dal client, e pubblicherà la risposta, rendendo notevolmente più veloce il video mostrato sugli occhiali.
+Questo in docker è molto semplice da fare, e su MQTT richiede solo il cambiamento del topic a cui iscritto e della versione
+di MQTT

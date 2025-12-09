@@ -1,17 +1,15 @@
-import sys
-sys.path.append("/Users/riccardosemeraro/Downloads/B.O.S.S.-Branch-Bellusci-SSD300-VGG16/training")
-
-import torch
+import torch, json
 import torchvision.transforms as T
 import cv2
 import os
-from dataset_builder import CocoHomeDataset
-from model_builder import create_ssd_model
+from training.dataset_builder import CocoHomeDataset
+from training.model_builder import create_ssd_model
 
 
 # ========================
 # CONFIGURAZIONE
 # ========================
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = "../saved_models/best_model.pth"  # percorso al modello
 CONF_THRESHOLD = 0.5
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps")
@@ -24,23 +22,33 @@ config = {
 # ========================
 # CARICAMENTO CLASSI
 # ========================
-data_dir = config['data_dir']
+'''data_dir = config['data_dir']
 annotations_file_template = config['annotations_file']
 train_ann_file = os.path.join(data_dir, annotations_file_template.format('train'))
 train_img_dir = os.path.join(data_dir, 'train')
 
 temp_dataset = CocoHomeDataset(images_dir=train_img_dir, annotations_file=train_ann_file)
 category_id_to_name = {cat['id']: cat['name'] for cat in temp_dataset.coco.loadCats(temp_dataset.category_ids)}
-HOME_CLASSES = ["__background__"] + [category_id_to_name[cid] for cid in temp_dataset.category_ids]
+HOME_CLASSES = ["__background__"] + [category_id_to_name[cid] for cid in temp_dataset.category_ids]'''
 
-print(f"[INFO] Classi caricate: {HOME_CLASSES}")
+# To Create Annotations File
+'''json_string = json.dumps(HOME_CLASSES, indent=4)
+with open("home_classes.json", "w") as f:
+    f.write(json_string)'''
+
+# Load Annotations File Created
+with open("home_classes.json", "r") as f:
+    HOME_CLASSES = json.load(f)
+
+num_classes = len(HOME_CLASSES)
+
+print(f"[INFO] {num_classes} Classi caricate: {HOME_CLASSES}")
 
 # ========================
 # CARICAMENTO MODELLO
 # ========================
-num_classes = temp_dataset.num_classes
 model = create_ssd_model(num_classes=num_classes, device=DEVICE)
-model.head.classification_head.num_classes = temp_dataset.num_classes
+model.head.classification_head.num_classes = num_classes
 model.load_state_dict(torch.load(MODEL_PATH, map_location=DEVICE))
 model.to(DEVICE)
 model.eval()
@@ -82,14 +90,14 @@ def infer_image(image_path):
                         cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
 
     cv2.imshow("SSD300 Detection - Image", orig)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+    cv2.waitKey(0)
     cv2.destroyAllWindows()
+
 
 
 # ========================
 # ESEMPIO DI USO
 # ========================
-test_image = os.path.join(train_img_dir, "000123.jpg")  # cambia immagine
+#test_image = os.path.join(train_img_dir, "000123.jpg")  # cambia immagine
 test_image = os.path.join("foto.jpg")  # cambia immagine
 infer_image(test_image)
