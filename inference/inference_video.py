@@ -1,7 +1,7 @@
 import sys
 sys.path.append('/app')
 
-import torch, json
+import torch, json, time
 import torchvision.transforms as T
 import cv2
 import os
@@ -16,7 +16,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(BASE_DIR, "../saved_models/best_model.pth")  # percorso al modello
 VIDEO_PATH = os.path.join(BASE_DIR, "../inference/video4.mp4")
 CONF_THRESHOLD = 0.5
-DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+DEVICE = torch.device("cpu" if torch.mps.is_available() else "cpu")
 
 config = {
     "data_dir": os.path.join(BASE_DIR, "../training/COCO-Home-Objects"),
@@ -63,7 +63,7 @@ model.eval()
 # ========================
 transform = T.Compose([
     T.ToPILImage(),
-    #T.Resize((300, 300)),
+    T.Resize((300, 300)),
     T.ToTensor(),
 ])
 
@@ -72,15 +72,21 @@ transform = T.Compose([
 # ========================
 
 # Inizializza SORT tracker
-tracker = Sort(max_age=20, min_hits=1, iou_threshold=0.2)
+tracker = Sort(max_age=30, min_hits=2, iou_threshold=0.2)
 # max_age è il numero massimo di frame la cui entità viene seguita
 # min_hits è il numero di predizioni sulla stessa entità necessarie per avere un ID
 # iou_threshold di quanto si può spostare la box della predizione
 
 cap = cv2.VideoCapture(VIDEO_PATH)
 
+width  = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+scale_x = width / 300
+scale_y = height / 300
+
 frame_count = 0
-DETECT_EVERY_N_FRAMES = 20
+DETECT_EVERY_N_FRAMES = 30
 
 if not cap.isOpened():
     raise RuntimeError(f"Impossibile aprire il video {VIDEO_PATH}")
@@ -104,6 +110,9 @@ def compute_iou(box1, box2):
 
 track_class_map = {}
 
+fps_start_time = time.time()
+processed_frames = 0
+
 while True:
     ret, frame = cap.read()
     if not ret:
@@ -111,11 +120,19 @@ while True:
 
     frame_count += 1
 
+    cv2.rectangle(frame, (0, 0), (300, 80), (0, 0, 0), -1)
+
     # Detection solo ogni N frame
     if frame_count % DETECT_EVERY_N_FRAMES == 0:
+        t0 = time.time()
         input_tensor = transform(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)).unsqueeze(0).to(DEVICE)
         with torch.no_grad():
             outputs = model(input_tensor)[0]
+
+        infer_time = (time.time() - t0) * 1000.0  # ms
+
+        cv2.putText(frame, f"Inference: {infer_time:.1f} ms", (10, 30),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 1)
 
         boxes = outputs['boxes'].cpu().numpy()
         scores = outputs['scores'].cpu().numpy()
@@ -158,12 +175,23 @@ while True:
             obj_id = int(obj[4])
             class_name = track_class_map.get(obj_id, "unknown")
 
-            x1, y1, x2, y2 = map(int, obj[:4])
+            x1 = int(obj[0] * scale_x)
+            y1 = int(obj[1] * scale_y)
+            x2 = int(obj[2] * scale_x)
+            y2 = int(obj[3] * scale_y)
             cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
             cv2.putText(frame, f"ID:{obj_id} {class_name}", (x1, y1 - 10),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
 
-        cv2.imshow("SSD300 Tracking", frame)
+        processed_frames += 1
+        elapsed = time.time() - fps_start_time
+        if elapsed > 0:
+            fps = processed_frames / elapsed
+            cv2.putText(frame, f"FPS: {fps:.1f}", (10, 65),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 1)
+
+        cv2.imshow("Tracking", frame)
+
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 

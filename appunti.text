@@ -3,6 +3,12 @@ python3 -m venv .venv -> crea l'ambiente
 source .venv/bin/activate -> attiva l'ambiente
 deactivate -> esce dall'ambiente
 
+# CREARE AMBIENTE CONDA
+conda init
+conda create -p ./<nome> python=3.13 pip -> crea l'ambiente con versione specifica e aggiunge il comando pip
+conda activate ./<nome> -> entra
+conda deactivate -> esce
+
 # GUI MAC DOCKER
 Idealmente converrebbe considerare l'hardware del mac come fosse l'hardware degli smart glasses, e creare i due
 container per il broker e per l'inference server.
@@ -29,4 +35,8 @@ Per scalare orizzontalmente le prestazioni, si può usare la versione "shared" d
 di inferenza e 1 "client", in questo modo uno per volta a rotazione un server di inferenza risponderà al frame
 ricevuto dal client, e pubblicherà la risposta, rendendo notevolmente più veloce il video mostrato sugli occhiali.
 Questo in docker è molto semplice da fare, e su MQTT richiede solo il cambiamento del topic a cui iscritto e della versione
-di MQTT
+di MQTT.
+
+Inoltre, per ottimizzare le prestazioni dell'inferenza, conviene prendere il frame nativo, convertirlo in 300x300; le
+coordinate ricevute poi si moltiplicano per il fattore di scala (dimensione nativa / 300), poiché il modello su cui è
+stato eseguito fine-tuning lavora meglio su frame 300x300
