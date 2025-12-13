@@ -1,3 +1,4 @@
-BROKER_HOST = "mqtt_brok"
+BROKER_CONTAINER = "mqtt_broker_test"
 BROKER_PORT = 1883
-TOPIC = "test/chat"
+TOPIC_FRAME = "smartglasses/frame"
+TOPIC_PRED = "smartglasses/pred"
