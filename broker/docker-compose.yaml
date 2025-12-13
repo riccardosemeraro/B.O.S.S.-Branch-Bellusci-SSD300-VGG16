@@ -1,0 +1,14 @@
+services:
+  mqtt_broker_test:
+    image: eclipse-mosquitto:latest
+    container_name: mqtt_broker_test
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
+    ports:
+      - "1883:1883"
+    networks:
+      - boss_network
+
+networks:
+  boss_network: # CREA LA RETE A LIVELLO GLOBALE
+    driver: bridge
