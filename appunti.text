@@ -1,3 +1,6 @@
+h#Installare librerire da i vari requirements
+pip install -r "file requirements"
+
 # Creare Ambiente VENV
 python3 -m venv .venv -> crea l'ambiente
 source .venv/bin/activate -> attiva l'ambiente
@@ -16,7 +19,7 @@ container per il broker e per l'inference server.
 Eventualmente si voglia implementare la GUI dentro il container allora (necessaria connessione internet):
 1. brew install --cask xquartz
 2. Riavvia MAC
-3. Abilitare Connessioni client in Apri XQuartz -> Impostazioni -> Client Network
+3. Abilitare Connessioni client in Apri XQuartz -> Impostazioni -> Protezione -> Consente le Connessioni da Client Network
 3. sostituito nei requirements.txt opencv-python-headless==4.12.0.88 con opencv-python==4.12.0.88 per supporto X11
 4. xhost +localhost -> per aggiungere localhost come gui remoto
 5. docker-compose up
