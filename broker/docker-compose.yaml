@@ -9,6 +9,41 @@ services:
     networks:
       - boss_network
 
+  client_test:
+    image: python:3.13-slim
+    container_name: client_test
+    working_dir: /app
+    depends_on:
+      - mqtt_broker_test
+      - server_test
+    volumes:
+      - ./test/client.py:/app/client.py
+      - ./configuration.py:/app/broker/configuration.py
+    networks:
+      - boss_network
+    command: >
+      sh -c "
+        pip install paho-mqtt &&
+        python -u client.py
+      "
+
+  server_test:
+    image: python:3.13-slim
+    container_name: server_test
+    working_dir: /app
+    depends_on:
+      - mqtt_broker_test
+    volumes:
+      - ./test/server.py:/app/server.py
+      - ./configuration.py:/app/broker/configuration.py
+    networks:
+      - boss_network
+    command: >
+      sh -c "
+        pip install paho-mqtt &&
+        python -u server.py
+      "
+
 networks:
   boss_network: # CREA LA RETE A LIVELLO GLOBALE
     driver: bridge

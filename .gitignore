@@ -4,7 +4,8 @@ training/COCO-Home-Objects/*
 __pycache__/
 .vscode/
 .ipynb_checkpoints/
-.DS_Store
+.DS_Store/
+.idea/
 
 training/best_model_18_80_pazienza_4_10.pth
 saved_models/best_model.pth

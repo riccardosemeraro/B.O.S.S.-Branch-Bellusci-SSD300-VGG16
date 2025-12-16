@@ -4,11 +4,11 @@ from broker.configuration import *
 
 def on_connect(client, userdata, flags, rc):
     print("Connesso al broker con codice", rc)
-    client.subscribe(TOPIC_FRAME)
+    client.subscribe(TOPIC_PRED)
 
 
 def on_message(client, userdata, msg):
-    print(f"Messaggio su {msg.topic}: {msg.payload.decode()}")
+    print(f"Ricevuto da: {msg.topic}: {msg.payload.decode()}")
 
 client = mqtt.Client()
 client.on_connect = on_connect
@@ -22,5 +22,7 @@ client.loop_start()
 for i in range(5):
     payload = f"ciao {i}"
     print("Pubblico:", payload)
-    client.publish(TOPIC_PRED, payload=payload, qos=0, retain=False)
+    client.publish(TOPIC_FRAME, payload=payload, qos=0, retain=False)
     time.sleep(1)
+
+client.loop_stop()
