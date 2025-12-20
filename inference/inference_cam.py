@@ -23,16 +23,27 @@ config = {
 # ========================
 # CARICAMENTO CLASSI
 # ========================
-data_dir = config['data_dir']
+'''data_dir = config['data_dir']
 annotations_file_template = config['annotations_file']
 train_ann_file = os.path.join(data_dir, annotations_file_template.format('train'))
 train_img_dir = os.path.join(data_dir, 'train')
 
 temp_dataset = CocoHomeDataset(images_dir=train_img_dir, annotations_file=train_ann_file)
 category_id_to_name = {cat['id']: cat['name'] for cat in temp_dataset.coco.loadCats(temp_dataset.category_ids)}
-HOME_CLASSES = ["__background__"] + [category_id_to_name[cid] for cid in temp_dataset.category_ids]
+HOME_CLASSES = ["__background__"] + [category_id_to_name[cid] for cid in temp_dataset.category_ids]'''
 
-print(f"[INFO] Classi caricate: {HOME_CLASSES}")
+# To Create Annotations File
+'''json_string = json.dumps(HOME_CLASSES, indent=4)
+with open("home_classes.json", "w") as f:
+    f.write(json_string)'''
+
+# Load Annotations File Created
+with open("home_classes.json", "r") as f:
+    HOME_CLASSES = json.load(f)
+
+num_classes = len(HOME_CLASSES)
+
+print(f"[INFO] {num_classes} Classi caricate: {HOME_CLASSES}")
 
 # ========================
 # CARICAMENTO MODELLO 
