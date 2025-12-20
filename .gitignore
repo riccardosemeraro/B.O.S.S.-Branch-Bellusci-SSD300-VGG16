@@ -4,7 +4,7 @@ training/COCO-Home-Objects/*
 __pycache__/
 .vscode/
 .ipynb_checkpoints/
-.DS_Store/
+.DS_Store
 */.DS_Store
 */*/.DS_Store
 */*/*/.DS_Store
