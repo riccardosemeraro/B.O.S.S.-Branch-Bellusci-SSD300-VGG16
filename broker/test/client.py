@@ -1,19 +1,28 @@
-from broker.configuration import *
+import time
 import paho.mqtt.client as mqtt
+from broker.configuration import *
 
 def on_connect(client, userdata, flags, rc):
     print("Connesso al broker con codice", rc)
-    client.subscribe(TOPIC_FRAME)
+    client.subscribe(TOPIC_PRED)
+
 
 def on_message(client, userdata, msg):
-    print(f"Ricevuto da {msg.topic}: {msg.payload.decode()}")
-    payload = f"Ho Ricevuto il Messaggio!!! 😃"
-    print("Pubblico:", payload)
-    client.publish(TOPIC_PRED, payload=payload, qos=0, retain=False)
+    print(f"Ricevuto da: {msg.topic}: {msg.payload.decode()}")
 
 client = mqtt.Client()
 client.on_connect = on_connect
 client.on_message = on_message
 
 client.connect(BROKER_CONTAINER, BROKER_PORT, keepalive=60)
-client.loop_forever()
+client.loop_start()
+# loop_forever impediva di avere il ruolo di publisher/subscriber,
+# dunque loop_start e loop_stop per gestire il flusso
+
+for i in range(5):
+    payload = f"ciao {i}"
+    print("Pubblico:", payload)
+    client.publish(TOPIC_FRAME, payload=payload, qos=0, retain=False)
+    time.sleep(1)
+
+client.loop_stop()
