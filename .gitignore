@@ -5,6 +5,11 @@ __pycache__/
 .vscode/
 .ipynb_checkpoints/
 .DS_Store/
+*/.DS_Store
+*/*/.DS_Store
+*/*/*/.DS_Store
+*/*/*/*/.DS_Store
+*/*/*/*/*/.DS_Store
 .idea/
 
 training/best_model_18_80_pazienza_4_10.pth
