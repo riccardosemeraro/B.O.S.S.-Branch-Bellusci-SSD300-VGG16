@@ -58,7 +58,7 @@ model.eval()
 # ========================
 transform = T.Compose([
     T.ToPILImage(),
-    #T.Resize((300, 300)),
+    T.Resize((300, 300)),
     T.ToTensor(),
 ])
 
@@ -67,6 +67,9 @@ transform = T.Compose([
 # ========================
 def infer_image(image_path):
     image = cv2.imread(image_path)
+    h, w = image.shape[:2]
+    scale_x = w / 300
+    scale_y = h / 300
     if image is None:
         print(f"[ERRORE] Immagine non trovata: {image_path}")
         return
@@ -84,6 +87,10 @@ def infer_image(image_path):
     for box, score, label in zip(boxes, scores, labels):
         if score >= CONF_THRESHOLD:
             x1, y1, x2, y2 = map(int, box)
+            x1 = int(x1 * scale_x)
+            x2 = int(x2 * scale_x)
+            y1 = int(y1 * scale_y)
+            y2 = int(y2 * scale_y)
             class_name = HOME_CLASSES[label]
             cv2.rectangle(orig, (x1, y1), (x2, y2), (0, 255, 0), 2)
             cv2.putText(orig, f"{class_name} {score:.2f}", (x1, y1 - 10),
