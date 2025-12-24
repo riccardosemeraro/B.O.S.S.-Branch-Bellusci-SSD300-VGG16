@@ -11,6 +11,8 @@ services:
     networks:
       - boss_network
 
+  # RIFAI DA QUI
+
   # Inference Server
   inference_server:
     build: ./inference # CARTELLA DOVE CERCA IL DOCKERFILE DA ESEGUIRE
