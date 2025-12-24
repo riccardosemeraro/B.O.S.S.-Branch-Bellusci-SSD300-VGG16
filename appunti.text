@@ -1,4 +1,4 @@
-h#Installare librerire da i vari requirements
+#Installare librerie da i vari requirements
 pip install -r "file requirements"
 
 # Creare Ambiente VENV
