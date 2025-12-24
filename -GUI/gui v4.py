@@ -133,12 +133,14 @@ class SmartGlassesGUI:
         pad_y = 12 * 2
         col_gap = 12  # gap fra colonne (approx)
 
-        # Altezza desiderata di una lente (scalata rispetto al video originale)
+        # 1) Altezza lente basata sul video (es: metà dell'altezza originale)
         desired_lens_h = int(self.video_h * VIDEO_SCALE_H)
 
-        # Altezza totale finestra: lente + padding; non superare una frazione dello schermo
-        max_target_h = int(screen_h * MAX_SCREEN_H_FRAC)
-        target_h = min(desired_lens_h + pad_y, max_target_h)
+        # 2) Altezza finestra = lente + padding (questa NON usa lo schermo come base)
+        target_h = desired_lens_h + pad_y
+
+        # 3) Solo clamp di sicurezza sullo schermo
+        target_h = min(target_h, int(screen_h * MAX_SCREEN_H_FRAC))
 
         # Altezza effettiva disponibile per la lente (tolti padding)
         lens_h = max(1, target_h - pad_y)
