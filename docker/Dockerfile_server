@@ -1,6 +1,6 @@
 FROM python:3.13-slim
 
-# Installa build dependencies per sort.py
+# Installa dipendenze sistema per OpenCV
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     gcc \
@@ -29,9 +29,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
-# Copia requirements dentro il container
-COPY requirements_inference.txt .
-RUN pip install -r requirements_inference.txt
+COPY requirements/requirements_server.txt .
+RUN pip install -r requirements_server.txt
 
-# Comando di avvio
-CMD ["python", "inference/inference_video.py"]
+CMD sh -c "python -u server.py"

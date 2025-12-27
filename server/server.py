@@ -1,11 +1,14 @@
-from broker.configuration import *
-import paho.mqtt.client as mqtt
 import sys
 sys.path.append('/app')
 
-import torch, json, time
+from broker.configuration import *
+import paho.mqtt.client as mqtt
+import json
 import numpy as np
 import cv2
+
+from pathlib import Path
+SCRIPT_DIR = Path(__file__).parent.parent
 
 # ========================
 # IMPORT SCRIPT INFERENZA

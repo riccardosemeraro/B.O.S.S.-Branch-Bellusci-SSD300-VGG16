@@ -4,16 +4,18 @@ sys.path.append('/app')
 import torch, json, time
 import torchvision.transforms as T
 import cv2
-import os
 from training.model_builder import create_ssd_model
+
+
+from pathlib import Path
+SCRIPT_DIR = Path(__file__).parent.parent
 
 class InferenceFunction:
     def __init__(self):
         # ========================
         # CONFIGURAZIONE
         # ========================
-        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-        MODEL_PATH = os.path.join(BASE_DIR, "../saved_models/best_model.pth")  # percorso al modello
+        MODEL_PATH = SCRIPT_DIR / "saved_models/best_model.pth"  # percorso al modello
         self.CONF_THRESHOLD = 0.5
         self.DEVICE = torch.device("cpu" if torch.mps.is_available() else "cpu")
 
@@ -22,7 +24,7 @@ class InferenceFunction:
         # ========================
 
         # Load Annotations File Created
-        with open("../inference/home_classes.json", "r") as f:
+        with open(SCRIPT_DIR / "inference/home_classes.json", "r") as f:
             self.HOME_CLASSES = json.load(f)
 
         num_classes = len(self.HOME_CLASSES)

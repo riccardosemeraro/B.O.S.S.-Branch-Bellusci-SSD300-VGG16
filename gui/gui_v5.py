@@ -14,7 +14,7 @@ class HUDState:
     wifi_on: bool = True
 
     # "Manopole" di sizing finestra
-    VIDEO_SCALE_H = 0.35
+    VIDEO_SCALE_H = 0.8
     MAX_SCREEN_H_FRAC = 0.80
 
 
@@ -58,7 +58,7 @@ class SmartGlassesGUI:
         target_w = pad_x + (2 * lens_w) + col_gap
         target_w = min(target_w, int(screen_w * 0.95))
 
-        cv2.resizeWindow("Smart Glasses GUI", target_w, target_h)
+        cv2.resizeWindow("SmartGlasses GUI", target_w, target_h)
 
     @staticmethod
     def _fit_size(max_w, max_h, ratio_h_over_w):
@@ -87,9 +87,13 @@ class SmartGlassesGUI:
     def _draw_left_hud(self, img):
         x, y = 12, 12
 
-        od = f"[Object Detection]: {'ON' if self.state.object_detection_on else 'OFF'}"
+        od = f"[Object Detection]: {'ON' if self.state.object_detection_on and not self.state.inference_ms == 0.0 else 'OFF'}"
         inf = f"[Inference Time]: {f'{self.state.inference_ms:.2f}' if self.state.object_detection_on else '-'} ms"
         fps = f"[FPS]: {f'{self.state.fps:.0f}' if self.state.object_detection_on else '-'} fps"
+
+        if self.state.inference_ms == 0.0:
+            text = "Loading model..."
+            self._draw_pill(img, 380, 250, text)
 
         self._draw_pill(img, x, y, od)
         self._draw_pill(img, x, y + 35, inf)
@@ -107,6 +111,10 @@ class SmartGlassesGUI:
 
         total_w = tw1 + tw2 + tw3 + self.PILL_PAD_X * 6 + 8
         start_x = max(12, w - 24 - total_w)
+
+        if self.state.inference_ms == 0.0:
+            text = "Loading model..."
+            self._draw_pill(img, start_x, 250, text)
 
         self._draw_pill(img, start_x, y, bat)
         self._draw_pill(img, start_x + tw1 + self.PILL_PAD_X * 2 + 4, y, wifi)

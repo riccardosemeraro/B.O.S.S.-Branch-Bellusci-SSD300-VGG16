@@ -1,14 +1,15 @@
-import sys
-import time
-
+import sys, os
 sys.path.append('/app')
 
+import time
 import json
 import cv2
-import os
 import paho.mqtt.client as mqtt
 from broker.configuration import *
 from gui.gui_v5 import SmartGlassesGUI
+
+from pathlib import Path
+SCRIPT_DIR = Path(__file__).parent.parent
 
 # ------------------
 # FUNZIONI
@@ -62,6 +63,17 @@ client.on_message = on_message
 # ------------------
 
 JSON_BOXES = None
+
+# ------------------
+# INIZIALIZZAZIONE GUI
+# ------------------
+
+cv2.namedWindow("SmartGlasses GUI")
+cv2.setWindowProperty("SmartGlasses GUI",
+                     cv2.WND_PROP_TOPMOST, 1)
+cv2.setWindowProperty("SmartGlasses GUI",
+                     cv2.WND_PROP_ASPECT_RATIO,
+                     cv2.WINDOW_NORMAL)
 smartGUI = SmartGlassesGUI()
 
 # ------------------
@@ -78,11 +90,9 @@ client.loop_start()
 # MAIN
 # ------------------
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-VIDEO_PATH = os.path.join(BASE_DIR, "../inference/video4.mp4")
+VIDEO_PATH = SCRIPT_DIR / "inference/video4.mp4"
 
-#cap = cv2.VideoCapture(VIDEO_PATH)
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(str(VIDEO_PATH))
 
 frame_count = 0
 DETECT_EVERY_N_FRAMES = 15

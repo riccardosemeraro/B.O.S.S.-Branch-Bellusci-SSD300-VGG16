@@ -1,0 +1,58 @@
+services:
+
+  # Broker MQTT per configurare la connessione
+  mqtt_broker:
+    image: eclipse-mosquitto:latest
+    container_name: mqtt_broker
+    volumes:
+      - ./broker/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    ports:
+      - "1883:1883"
+    networks:
+      - boss_network
+
+  server:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile_server
+    container_name: server_inference
+    depends_on:
+      - mqtt_broker
+    working_dir: /app
+    volumes:
+      - ./saved_models:/app/saved_models
+      - ./server:/app
+      - ./training:/app/training
+      - ./inference:/app/inference
+      - ./broker/configuration.py:/app/broker/configuration.py
+    networks:
+      - boss_network
+
+  client:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile_client
+    container_name: client_smartglasses
+    depends_on:
+      - mqtt_broker
+      - server
+    working_dir: /app
+    environment:
+      - DISPLAY=host.docker.internal:0    # Display X11 sul Mac
+      - QT_QPA_PLATFORM=xcb              # Forza Qt a usare XCB
+      - QT_X11_NO_MITSHM=1
+      - OPENCV_HIGHGUI_WINDOW_PUT_TEXT=1
+      - OPENCV_IO_ENABLE_OPENEXR=0
+      - OPENCV_VIDEOIO_PRIORITY_MSMF=0
+    volumes:
+      - ./client:/app/client
+      - ./broker/configuration.py:/app/broker/configuration.py
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ./gui:/app/gui
+      - ./inference/video4.mp4:/app/inference/video4.mp4
+    networks:
+      - boss_network
+
+networks:
+  boss_network: # CREA LA RETE A LIVELLO GLOBALE
+    driver: bridge
