@@ -372,6 +372,8 @@ class SmartGlassesGUI:
             self.apply_state()
             self.root.after(30, self.update_frames)
             return
+        
+        # draw boxes
 
         # Renderizza lo stesso frame su entrambe le lenti
         self._tk_img_left = self._render_on_canvas(self.cap_left, self._img_id_left, frame, w1, h1)
