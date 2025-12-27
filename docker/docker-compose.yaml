@@ -5,7 +5,7 @@ services:
     image: eclipse-mosquitto:latest
     container_name: mqtt_broker
     volumes:
-      - ./broker/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - ../broker/mosquitto.conf:/mosquitto/config/mosquitto.conf
     ports:
       - "1883:1883"
     networks:

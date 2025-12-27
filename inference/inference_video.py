@@ -6,7 +6,6 @@ import torchvision.transforms as T
 import cv2
 import os
 from training.model_builder import create_ssd_model
-from sort import Sort
 import numpy as np
 
 # ========================
@@ -15,7 +14,7 @@ import numpy as np
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(BASE_DIR, "../saved_models/best_model.pth")  # percorso al modello
 VIDEO_PATH = os.path.join(BASE_DIR, "../inference/video4.mp4")
-CONF_THRESHOLD = 0.5
+CONF_THRESHOLD = 0.7
 DEVICE = torch.device("cpu" if torch.mps.is_available() else "cpu")
 
 config = {
@@ -26,19 +25,6 @@ config = {
 # ========================
 # CARICAMENTO CLASSI
 # ========================
-'''data_dir = config['data_dir']
-annotations_file_template = config['annotations_file']
-train_ann_file = os.path.join(data_dir, annotations_file_template.format('train'))
-train_img_dir = os.path.join(data_dir, 'train')
-
-temp_dataset = CocoHomeDataset(images_dir=train_img_dir, annotations_file=train_ann_file)
-category_id_to_name = {cat['id']: cat['name'] for cat in temp_dataset.coco.loadCats(temp_dataset.category_ids)}
-HOME_CLASSES = ["__background__"] + [category_id_to_name[cid] for cid in temp_dataset.category_ids]'''
-
-# To Create Annotations File
-'''json_string = json.dumps(HOME_CLASSES, indent=4)
-with open("home_classes.json", "w") as f:
-    f.write(json_string)'''
 
 # Load Annotations File Created
 with open("home_classes.json", "r") as f:
@@ -57,7 +43,6 @@ model.load_state_dict(torch.load(MODEL_PATH, map_location=DEVICE))
 model.to(DEVICE)
 model.eval()
 
-
 # ========================
 # TRASFORMAZIONE
 # ========================
@@ -71,11 +56,81 @@ transform = T.Compose([
 # INFERENZA SU VIDEO
 # ========================
 
-# Inizializza SORT tracker
-tracker = Sort(max_age=30, min_hits=2, iou_threshold=0.2)
-# max_age è il numero massimo di frame la cui entità viene seguita
-# min_hits è il numero di predizioni sulla stessa entità necessarie per avere un ID
-# iou_threshold di quanto si può spostare la box della predizione
+def draw_boxes(frame, boxes, scores, labels, infer_time, fps):
+    # overlay nero per testo
+    cv2.rectangle(frame, (0, 0), (300, 80), (0, 0, 0), -1)
+
+    # Scrivo il tempo di inference
+    cv2.putText(frame, f"Inference: {infer_time:.1f} ms", (10, 30),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 1)
+
+    # Scrivo gli FPS
+    cv2.putText(frame, f"FPS: {fps:.1f}", (10, 65),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 1)
+
+    # Disegna le detection direttamente (senza tracking)
+    for box, score, label in zip(boxes, scores, labels):
+        # box è nel sistema 300x300, riscalo alle dimensioni del frame originale
+        x1 = int(box[0] * scale_x)
+        y1 = int(box[1] * scale_y)
+        x2 = int(box[2] * scale_x)
+        y2 = int(box[3] * scale_y)
+
+        class_name = HOME_CLASSES[int(label)]
+
+        cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+        cv2.putText(
+            frame,
+            f"{class_name} {score:.2f}",
+            (x1, max(y1 - 10, 0)),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.6,
+            (0, 255, 0),
+            2,
+        )
+
+    return frame
+
+def draw_boxes_from_json(frame, json_path):
+    with open(json_path, "r") as f:
+        data = json.load(f)
+
+    # opzionale: mostrare inference time e fps sul frame
+    inf_ms = data.get("inference_time_ms", None)
+    fps = data.get("fps", None)
+
+    cv2.rectangle(frame, (0, 0), (300, 80), (0, 0, 0), -1)
+
+    if inf_ms is not None:
+        cv2.putText(frame, f"Inference: {inf_ms:.1f} ms", (10, 30),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 1)
+    if fps is not None:
+        cv2.putText(frame, f"FPS: {fps:.1f}", (10, 65),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 1)
+
+    for obj in data["objects"]:
+        bbox = obj["bbox"]
+        class_name = obj["class_name"]
+        score = obj["score"]
+
+        x1 = int(bbox["x1"])
+        y1 = int(bbox["y1"])
+        x2 = int(bbox["x2"])
+        y2 = int(bbox["y2"])
+
+        cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+        cv2.putText(
+            frame,
+            f"{class_name} {score:.2f}",
+            (x1, max(y1 - 10, 0)),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.6,
+            (0, 255, 0),
+            2,
+        )
+
+    return frame
+
 
 cap = cv2.VideoCapture(VIDEO_PATH)
 
@@ -86,29 +141,10 @@ scale_x = width / 300
 scale_y = height / 300
 
 frame_count = 0
-DETECT_EVERY_N_FRAMES = 30
+DETECT_EVERY_N_FRAMES = 15
 
 if not cap.isOpened():
     raise RuntimeError(f"Impossibile aprire il video {VIDEO_PATH}")
-
-# Funzione per assegnare univocamente un id ad una classe predetta
-def compute_iou(box1, box2):
-    """Calcola Intersection over Union tra due bbox"""
-    x1 = max(box1[0], box2[0])
-    y1 = max(box1[1], box2[1])
-    x2 = min(box1[2], box2[2])
-    y2 = min(box1[3], box2[3])
-
-    inter_area = max(0, x2 - x1) * max(0, y2 - y1)
-    box1_area = (box1[2] - box1[0]) * (box1[3] - box1[1])
-    box2_area = (box2[2] - box2[0]) * (box2[3] - box2[1])
-
-    if box1_area + box2_area == 0:
-        return 0.0
-
-    return inter_area / (box1_area + box2_area - inter_area)
-
-track_class_map = {}
 
 fps_start_time = time.time()
 processed_frames = 0
@@ -120,19 +156,15 @@ while True:
 
     frame_count += 1
 
-    cv2.rectangle(frame, (0, 0), (300, 80), (0, 0, 0), -1)
-
     # Detection solo ogni N frame
     if frame_count % DETECT_EVERY_N_FRAMES == 0:
         t0 = time.time()
         input_tensor = transform(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)).unsqueeze(0).to(DEVICE)
+
         with torch.no_grad():
             outputs = model(input_tensor)[0]
 
         infer_time = (time.time() - t0) * 1000.0  # ms
-
-        cv2.putText(frame, f"Inference: {infer_time:.1f} ms", (10, 30),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 1)
 
         boxes = outputs['boxes'].cpu().numpy()
         scores = outputs['scores'].cpu().numpy()
@@ -144,56 +176,59 @@ while True:
         scores = scores[mask]
         labels = labels[mask]
 
-        # Prepara detection per SORT (formato: [x1, y1, x2, y2, score])
-        if len(boxes) > 0:
-            detections = np.column_stack([boxes, scores])
-        else:
-            detections = np.empty((0, 5))
-
-        # SORT aggiorna i tracker (velocissimo!)
-        tracked_objects = tracker.update(detections)
-
-        # Associa ogni detection al suo track ID per INDICE
-        for track_obj in tracked_objects:
-            track_box = track_obj[:4]
-            track_id = int(track_obj[4])
-
-            best_iou = 0
-            best_label_idx = -1
-
-            for det_idx, det_box in enumerate(boxes):
-                iou_score = compute_iou(track_box, det_box)
-                if iou_score > best_iou and iou_score > 0.3:
-                    best_iou = iou_score
-                    best_label_idx = det_idx
-
-            if best_label_idx != -1:
-                track_class_map[track_id] = HOME_CLASSES[labels[best_label_idx]]
-
-        # Disegna gli oggetti tracciati
-        for obj in tracked_objects:
-            obj_id = int(obj[4])
-            class_name = track_class_map.get(obj_id, "unknown")
-
-            x1 = int(obj[0] * scale_x)
-            y1 = int(obj[1] * scale_y)
-            x2 = int(obj[2] * scale_x)
-            y2 = int(obj[3] * scale_y)
-            cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
-            cv2.putText(frame, f"ID:{obj_id} {class_name}", (x1, y1 - 10),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
-
+        # FPS globale (come stavi già facendo)
         processed_frames += 1
         elapsed = time.time() - fps_start_time
-        if elapsed > 0:
-            fps = processed_frames / elapsed
-            cv2.putText(frame, f"FPS: {fps:.1f}", (10, 65),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 1)
+        fps = processed_frames / elapsed if elapsed > 0 else 0.0
 
-        cv2.imshow("Tracking", frame)
+        # ------------------
+        # COSTRUZIONE JSON
+        # ------------------
+        frame_annotations = {
+            "inference_time_ms": infer_time,
+            "fps": fps,
+            "objects": []
+        }
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+        # Disegna le detection direttamente (senza tracking)
+        for box, score, label in zip(boxes, scores, labels):
+            # box è nel sistema 300x300, riscalo alle dimensioni del frame originale
+            x1 = int(box[0] * scale_x)
+            y1 = int(box[1] * scale_y)
+            x2 = int(box[2] * scale_x)
+            y2 = int(box[3] * scale_y)
+
+            class_name = HOME_CLASSES[int(label)]
+
+            frame_annotations["objects"].append({
+                "class_name": class_name,
+                "score": float(score),
+                "bbox": {
+                    "x1": x1,
+                    "y1": y1,
+                    "x2": x2,
+                    "y2": y2
+                }
+            })
+
+        frame = draw_boxes(frame, boxes, scores, labels, infer_time, fps)
+
+        # salva JSON
+        json_path = os.path.join(BASE_DIR, f"frame.json")
+        with open(json_path, "w") as jf:
+            json.dump(frame_annotations, jf, indent=2)
+
+    else:
+        x = 2
+        # Invia stesso file creato nel caso then
+
+    # Mostra comunque l'ultimo frame aggiornato
+    cv2.imshow("Detections", draw_boxes_from_json(frame, "./frame.json"))
+
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+
 
 cap.release()
 cv2.destroyAllWindows()
