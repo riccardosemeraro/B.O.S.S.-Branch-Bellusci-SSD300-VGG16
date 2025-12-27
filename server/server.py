@@ -26,7 +26,7 @@ def on_message(client, userdata, msg):
     frame_annotations = inference_function.predict(frame)
 
     # Pubblica le annotazioni sul topic delle predizioni
-    client.publish(TOPIC_PRED, payload=json.dumps(frame_annotations), qos=2, retain=False)
+    client.publish(TOPIC_PRED, payload=json.dumps(frame_annotations), qos=1, retain=False)
 
 client = mqtt.Client(callback_api_version=mqtt.CallbackAPIVersion.VERSION2)
 client.on_connect = on_connect

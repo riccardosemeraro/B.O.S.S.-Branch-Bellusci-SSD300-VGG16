@@ -4,33 +4,25 @@ from dataclasses import dataclass
 import cv2
 import numpy as np
 
-# Directory dello script e path al video
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-PATH_VIDEO = os.path.join(BASE_DIR, "../inference/video4.mp4")
-
-# "Manopole" di sizing finestra
-VIDEO_SCALE_H = 0.35
-MAX_SCREEN_H_FRAC = 0.80
-
 
 @dataclass
 class HUDState:
     object_detection_on: bool = True
-    inference_ms: float = 200.0
+    inference_ms: float = 0.0
     fps: float = 5.0
     battery_pct: int = 87
     wifi_on: bool = True
+
+    # "Manopole" di sizing finestra
+    VIDEO_SCALE_H = 0.35
+    MAX_SCREEN_H_FRAC = 0.80
 
 
 class SmartGlassesGUI:
     def __init__(self):
         self.state = HUDState()
-        self.cap = cv2.VideoCapture(PATH_VIDEO)
-        if not self.cap.isOpened():
-            raise RuntimeError(f"Impossibile aprire il video: {PATH_VIDEO}")
 
-        self.video_w = int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-        self.video_h = int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        self.video_h, self.video_w = 1080, 1920 #self.state.frame.shape[:2]
         self.video_ratio = self.video_h / self.video_w
 
         self._t_last = time.time()
@@ -46,9 +38,10 @@ class SmartGlassesGUI:
         self.PILL_PAD_Y = 6
         self.PILL_RADIUS = 14
 
-        cv2.namedWindow("Smart Glasses GUI", cv2.WINDOW_NORMAL)
         self._set_initial_geometry()
-        self.update_frames()
+
+    def setInferenceTime(self, ms):
+        self.state.inference_ms = ms
 
     def _set_initial_geometry(self):
         screen_w = 1920
@@ -57,9 +50,9 @@ class SmartGlassesGUI:
         pad_y = 24
         col_gap = 12
 
-        desired_lens_h = int(self.video_h * VIDEO_SCALE_H)
+        desired_lens_h = int(self.video_h * self.state.VIDEO_SCALE_H)
         target_h = desired_lens_h + pad_y
-        target_h = min(target_h, int(screen_h * MAX_SCREEN_H_FRAC))
+        target_h = min(target_h, int(screen_h * self.state.MAX_SCREEN_H_FRAC))
         lens_h = max(1, target_h - pad_y)
         lens_w = int(lens_h / self.video_ratio)
         target_w = pad_x + (2 * lens_w) + col_gap
@@ -93,7 +86,6 @@ class SmartGlassesGUI:
 
     def _draw_left_hud(self, img):
         x, y = 12, 12
-        gap = 4
 
         od = f"[Object Detection]: {'ON' if self.state.object_detection_on else 'OFF'}"
         inf = f"[Inference Time]: {f'{self.state.inference_ms:.2f}' if self.state.object_detection_on else '-'} ms"
@@ -120,11 +112,7 @@ class SmartGlassesGUI:
         self._draw_pill(img, start_x + tw1 + self.PILL_PAD_X * 2 + 4, y, wifi)
         self._draw_pill(img, start_x + tw1 + tw2 + self.PILL_PAD_X * 4 + 8, y, bt)
 
-    def update_frames(self):
-        ret, frame = self.cap.read()
-        if not ret:
-            self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
-            ret, frame = self.cap.read()
+    def update_canvas(self, frame):
 
         t = time.time()
         dt = max(1e-6, t - self._t_last)
@@ -152,18 +140,4 @@ class SmartGlassesGUI:
         self._draw_left_hud(canvas)
         self._draw_right_hud(canvas, canvas_w)
 
-        cv2.imshow("Smart Glasses GUI", canvas)
-
-        # Simulazione Latenza Webcam
-        time.sleep(0.01)
-
-        key = cv2.waitKey(15) & 0xFF
-        if key == 27:
-            cv2.destroyAllWindows()
-            self.cap.release()
-            return
-        self.update_frames()
-
-
-if __name__ == "__main__":
-    app = SmartGlassesGUI()
+        return canvas

@@ -218,17 +218,14 @@ while True:
         with open(json_path, "w") as jf:
             json.dump(frame_annotations, jf, indent=2)
 
-    else:
-        x = 2
-        # Invia stesso file creato nel caso then
+    #else:
+        # Usa stesso file creato nel caso then
 
     # Mostra comunque l'ultimo frame aggiornato
     cv2.imshow("Detections", draw_boxes_from_json(frame, "./frame.json"))
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
-
-
 
 cap.release()
 cv2.destroyAllWindows()

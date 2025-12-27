@@ -8,26 +8,13 @@ import cv2
 import os
 import paho.mqtt.client as mqtt
 from broker.configuration import *
+from gui.gui_v5 import SmartGlassesGUI
 
 # ------------------
 # FUNZIONI
 # ------------------
 
 def draw_boxes_from_json(frame, data):
-    data = json.loads(data)
-
-    # opzionale: mostrare inference time e fps sul frame
-    inf_ms = data.get("inference_time_ms", None)
-    fps = data.get("fps", None)
-
-    cv2.rectangle(frame, (0, 0), (300, 80), (0, 0, 0), -1)
-
-    if inf_ms is not None:
-        cv2.putText(frame, f"Inference: {inf_ms:.1f} ms", (10, 30),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 1)
-    if fps is not None:
-        cv2.putText(frame, f"FPS: {fps:.1f}", (10, 65),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 1)
 
     for obj in data["objects"]:
         bbox = obj["bbox"]
@@ -75,6 +62,7 @@ client.on_message = on_message
 # ------------------
 
 JSON_BOXES = None
+smartGUI = SmartGlassesGUI()
 
 # ------------------
 # CONNESSIONE AL BROKER MQTT
@@ -93,7 +81,8 @@ client.loop_start()
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 VIDEO_PATH = os.path.join(BASE_DIR, "../inference/video4.mp4")
 
-cap = cv2.VideoCapture(VIDEO_PATH)
+#cap = cv2.VideoCapture(VIDEO_PATH)
+cap = cv2.VideoCapture(1)
 
 frame_count = 0
 DETECT_EVERY_N_FRAMES = 15
@@ -112,12 +101,20 @@ while True:
     frame_to_bytes = buffer.tobytes()
 
     if frame_count % DETECT_EVERY_N_FRAMES == 0:
-        client.publish(TOPIC_FRAME, payload=frame_to_bytes, qos=2, retain=False)
+        client.publish(TOPIC_FRAME, payload=frame_to_bytes, qos=1, retain=False)
 
     if JSON_BOXES is not None:
-        frame = draw_boxes_from_json(frame, JSON_BOXES)
+        data = json.loads(JSON_BOXES)
+        # opzionale: mostrare inference time e fps sul frame
+        inf_ms = data.get("inference_time_ms", None)
+        smartGUI.setInferenceTime(inf_ms)
 
-    cv2.imshow("Detections", frame)
+        frame = draw_boxes_from_json(frame, data)
+
+    canvas = smartGUI.update_canvas(frame)
+    time.sleep(0.01)
+
+    cv2.imshow("SmartGlasses GUI", canvas)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break

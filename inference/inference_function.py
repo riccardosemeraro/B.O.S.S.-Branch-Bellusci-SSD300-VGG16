@@ -54,9 +54,6 @@ class InferenceFunction:
         scale_x = width / 300
         scale_y = height / 300
 
-        fps_start_time = time.time()
-        processed_frames = 0
-
         t0 = time.time()
         input_tensor = self.transform(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)).unsqueeze(0).to(self.DEVICE)
 
@@ -75,17 +72,11 @@ class InferenceFunction:
         scores = scores[mask]
         labels = labels[mask]
 
-        # FPS globale
-        processed_frames += 1
-        elapsed = time.time() - fps_start_time
-        fps = processed_frames / elapsed if elapsed > 0 else 0.0
-
         # ------------------
         # COSTRUZIONE JSON
         # ------------------
         frame_annotations = {
             "inference_time_ms": infer_time,
-            "fps": fps,
             "objects": []
         }
 
