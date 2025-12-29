@@ -149,47 +149,70 @@ Il progetto **B.O.S.S.** mira a sviluppare un sistema di assistenza visiva basat
   
 
 ```
-
-┌─────────────────┐ MQTT ┌─────────────────┐
-
-│ Client GUI │◄──────────►│ Broker │
-
-│ (Wearable Sim) │ │ (Mosquitto) │
-
-└─────────────────┘ └─────────────────┘
-
-│ │
-
-│ │
-
-▼ ▼
-
-┌─────────────────┐ ┌─────────────────┐
-
-│ Image Capture │ │ Inference │
-
-│ (OpenCV) │ │ Service │
-
-└─────────────────┘ └─────────────────┘
-
-│ │
-
-│ │
-
-▼ ▼
-
-┌─────────────────┐ ┌─────────────────┐
-
-│ Bounding Boxes │◄────────────┤ SSD300 Model │
-
-│ + Classes │ │ (VGG16) │
-
-│ + Confidences │ └─────────────────┘
-
-└─────────────────┘
+      ┌─────────────────┐     MQTT   ┌─────────────────┐
+      │ Client GUI      │◄──────────►│     Broker      │
+      │ (Wearable Sim)  │            │   (Mosquitto)   │
+      └─────────────────┘            └─────────────────┘
+              │                          │
+              ▼                          ▼
+      ┌─────────────────┐       ┌─────────────────┐
+      │ Image Capture    │       │ Inference        │
+      │ (OpenCV)         │       │ Service          │
+      └─────────────────┘       └─────────────────┘
+              │                          │
+              ▼                          ▼
+      ┌─────────────────┐              ┌─────────────────┐
+      │ Bounding Boxes   │◄────────────┤ SSD300 Model    │
+      │ + Classes        │             │ (VGG16)         │
+      │ + Confidences    │             └─────────────────┘
+      └─────────────────┘
 
 ```
 
+  
+```mermaid
+flowchart TB
+
+Client["Client GUI<br/>(Wearable Sim)"] <--> |MQTT| Broker["Broker<br/>(Mosquitto)"]
+
+  
+
+Client --> Capture["Image Capture<br/>(OpenCV)"]
+
+Broker --> Inference["Inference<br/>Service"]
+
+  
+
+Capture --> Output["Bounding Boxes<br/>+ Classes<br/>+ Confidences"]
+
+Inference --> Model["SSD300 Model<br/>(VGG16)"]
+
+Model --> Output
+
+```
+
+```mermaid
+flowchart TB
+  C_Client["Client GUI (Wearable Sim)"] <--> |MQTT| C_Broker["Broker (Mosquitto)"]
+
+  C_Client --> C_Capture["Image Capture (OpenCV)"]
+  C_Broker --> C_Inference["Inference Service"]
+
+  C_Capture --> C_Output["Bounding Boxes + Classes + Confidences"]
+  C_Inference --> C_Model["SSD300 Model (VGG16)"]
+  C_Model --> C_Output
+```
+ 
+```mermaid
+flowchart LR
+  E_Client["Client GUI (Wearable Sim)"] --> E_Capture["Image Capture (OpenCV)"] --> E_Output["Bounding Boxes + Classes + Confidences"]
+  S_Broker["Broker (Mosquitto)"] --> S_Inference["Inference Service"] --> S_Model["SSD300 Model (VGG16)"]
+
+  E_Client -->|"boss/image"| S_Broker
+  S_Broker -->|"boss/detections"| E_Client
+  S_Model --> E_Output
+
+```
   
 
 ### Componenti Dettagliati
