@@ -1116,7 +1116,7 @@ Documentazione :done, 2024-02-25, 2024-03-15
 **Note:** I diagrammi mostrano un progetto di circa 10 settimane. Il percorso critico passa attraverso Studio Tecnologie → Training Modello → Testing.
 
 
-**MODIFICATI**  
+**------------------------ MODIFICATI ------------------------**  
 
 ```mermaid
  gantt
