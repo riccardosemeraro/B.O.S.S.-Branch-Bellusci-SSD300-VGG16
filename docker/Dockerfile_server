@@ -32,4 +32,4 @@ WORKDIR /app
 COPY requirements/requirements_server.txt .
 RUN pip install -r requirements_server.txt
 
-CMD sh -c "python -u server.py"
+CMD sh -c "python -u server/server.py"
