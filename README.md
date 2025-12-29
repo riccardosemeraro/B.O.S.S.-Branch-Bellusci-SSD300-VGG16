@@ -148,25 +148,24 @@ Il progetto **B.O.S.S.** mira a sviluppare un sistema di assistenza visiva basat
 
   
 
-```
-      ┌─────────────────┐     MQTT   ┌─────────────────┐
-      │ Client GUI      │◄──────────►│     Broker      │
-      │ (Wearable Sim)  │            │   (Mosquitto)   │
-      └─────────────────┘            └─────────────────┘
-              │                          │
-              ▼                          ▼
-      ┌─────────────────┐       ┌─────────────────┐
-      │ Image Capture    │       │ Inference        │
-      │ (OpenCV)         │       │ Service          │
-      └─────────────────┘       └─────────────────┘
-              │                          │
-              ▼                          ▼
-      ┌─────────────────┐              ┌─────────────────┐
-      │ Bounding Boxes   │◄────────────┤ SSD300 Model    │
-      │ + Classes        │             │ (VGG16)         │
-      │ + Confidences    │             └─────────────────┘
-      └─────────────────┘
-
+```     
+      +-----------------+   MQTT   +-----------------+
+      | Client GUI      |<-------->|     Broker      |
+      | (Wearable Sim)  |          |   (Mosquitto)   |
+      +-----------------+          +-----------------+
+              |                          |
+              v                          v
+      +------------------+      +-----------------+
+      | Image Capture    |      | Inference       |
+      | (OpenCV)         |      | Service         |
+      +------------------+      +-----------------+
+              |                          |
+              v                          v
+      +------------------+       +-----------------+
+      | Bounding Boxes   |<----- | SSD300 Model    |
+      | + Classes        |       | (VGG16)         |
+      | + Confidences    |       +-----------------+
+      +------------------+
 ```
 
   
@@ -214,6 +213,7 @@ flowchart LR
 
 ```
   
+  ---
 
 ### Componenti Dettagliati
 
@@ -580,16 +580,10 @@ python  main.py  --config  config.json
 ### Topics
 
   
-
-| Topic | Direzione | Payload | Descrizione |
-
-|-------|-----------|---------|-------------|
-
-| `boss/image` | Client → Server | Base64 encoded image | Immagine da analizzare |
-
-| `boss/detections` | Server → Client | JSON detections | Risultati rilevamento |
-
-  
+| Topic           | Direzione       | Payload              | Descrizione            |
+| --------------- | --------------- | -------------------- | ---------------------- |
+| boss/image      | Client → Server | Base64 encoded image | Immagine da analizzare |
+| boss/detections | Server → Client | JSON detections      | Risultati rilevamento  |
 
 ### Esempio Client MQTT
 
@@ -1121,7 +1115,49 @@ Documentazione :done, 2024-02-25, 2024-03-15
 
 **Note:** I diagrammi mostrano un progetto di circa 10 settimane. Il percorso critico passa attraverso Studio Tecnologie → Training Modello → Testing.
 
-  
+
+**MODIFICATI**  
+
+```mermaid
+  gantt
+title Progetto B.O.S.S. - Al Più Presto
+dateFormat YYYY-MM-DD
+
+section Studio
+Studio Tecnologie :done, st, 2025-10-12, 4d
+
+section Sviluppo
+Training Modello :done, tm, after st, 28d
+Riorganizzazione Repo :done, rr, after st, 7d
+Script Inference :done, si, after rr, 10d
+GUI Client :done, gui, after rr, 12d
+Integrazione MQTT :done, mqtt, after rr, 10d
+
+section Testing
+Testing :done, test, after tm, 10d
+Documentazione :done, doc, after test, 6d
+```
+
+```mermaid
+gantt
+title Progetto B.O.S.S. - Al Più Tardi
+dateFormat YYYY-MM-DD
+
+section Studio
+Studio Tecnologie :done, st2, 2025-10-12, 4d
+
+section Sviluppo
+Riorganizzazione Repo :done, rr2, after st2, 7d
+GUI Client :done, gui2, after rr2, 12d
+Integrazione MQTT :done, mqtt2, after rr2, 10d
+Script Inference :done, si2, after rr2, 10d
+Training Modello :done, tm2, 2025-11-12, 28d
+
+section Testing
+Testing :done, test2, after tm2, 10d
+Documentazione :done, doc2, after test2, 6d
+```
+
 
 ---
 
