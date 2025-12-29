@@ -1119,43 +1119,44 @@ Documentazione :done, 2024-02-25, 2024-03-15
 **MODIFICATI**  
 
 ```mermaid
-  gantt
+ gantt
 title Progetto B.O.S.S. - Al Più Presto
-dateFormat YYYY-MM-DD
+dateFormat DD-MM-YYYY
 
 section Studio
-Studio Tecnologie :done, st, 2025-10-12, 4d
+Studio Tecnologie :done, 12-10-2025, 26-10-2025
 
 section Sviluppo
-Training Modello :done, tm, after st, 28d
-Riorganizzazione Repo :done, rr, after st, 7d
-Script Inference :done, si, after rr, 10d
-GUI Client :done, gui, after rr, 12d
-Integrazione MQTT :done, mqtt, after rr, 10d
+Riorganizzazione Repo :done, 21-10-2025, 05-11-2025
+Script Inference :done, 31-10-2025, 16-11-2025
+GUI Client :done, 05-11-2025, 21-11-2025
+Integrazione MQTT :done, 12-11-2025, 26-11-2025
+Training Modello :done, 26-10-2025, 11-12-2025
 
 section Testing
-Testing :done, test, after tm, 10d
-Documentazione :done, doc, after test, 6d
+Testing :done, 01-12-2025, 19-12-2025
+Documentazione :done, 05-12-2025, 29-12-2025
 ```
 
 ```mermaid
 gantt
 title Progetto B.O.S.S. - Al Più Tardi
-dateFormat YYYY-MM-DD
+dateFormat DD-MM-YYYY
 
 section Studio
-Studio Tecnologie :done, st2, 2025-10-12, 4d
+Studio Tecnologie :done, 12-10-2025, 26-10-2025
 
 section Sviluppo
-Riorganizzazione Repo :done, rr2, after st2, 7d
-GUI Client :done, gui2, after rr2, 12d
-Integrazione MQTT :done, mqtt2, after rr2, 10d
-Script Inference :done, si2, after rr2, 10d
-Training Modello :done, tm2, 2025-11-12, 28d
+Riorganizzazione Repo :done, 21-10-2025, 05-11-2025
+Script Inference :done, 31-10-2025, 16-11-2025
+GUI Client :done, 05-11-2025, 21-11-2025
+Integrazione MQTT :done, 12-11-2025, 26-11-2025
+Training Modello :done, 26-10-2025, 11-12-2025
 
 section Testing
-Testing :done, test2, after tm2, 10d
-Documentazione :done, doc2, after test2, 6d
+Testing :done, 01-12-2025, 19-12-2025
+Documentazione :done, 05-12-2025, 29-12-2025
+
 ```
 
 
