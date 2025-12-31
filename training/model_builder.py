@@ -7,7 +7,7 @@ def create_ssd_model(num_classes, device):
     weights = SSD300_VGG16_Weights.COCO_V1
     #model = ssd300_vgg16(weights=weights)
 
-    # disattiva TUTTI i pesi
+    # disattiva TUTTI i pesi (utile quando carico il modello già addestrato per inference_function)
     model = ssd300_vgg16(
         weights=None,
         weights_backbone=None

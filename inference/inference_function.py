@@ -12,16 +12,16 @@ SCRIPT_DIR = Path(__file__).parent.parent
 
 class InferenceFunction:
     def __init__(self):
-        # ========================
+        # --------------
         # CONFIGURAZIONE
-        # ========================
+        # --------------
         MODEL_PATH = SCRIPT_DIR / "saved_models/best_model.pth"  # percorso al modello
         self.CONF_THRESHOLD = 0.5
         self.DEVICE = torch.device("cpu" if torch.mps.is_available() else "cpu")
 
-        # ========================
+        # ------------------
         # CARICAMENTO CLASSI
-        # ========================
+        # ------------------
 
         # Load Annotations File Created
         with open(SCRIPT_DIR / "inference/home_classes.json", "r") as f:
@@ -31,18 +31,18 @@ class InferenceFunction:
 
         print(f"[INFO] {num_classes} Classi caricate: {self.HOME_CLASSES}")
 
-        # ========================
+        # -------------------
         # CARICAMENTO MODELLO
-        # ========================
+        # -------------------
         self.model = create_ssd_model(num_classes=num_classes, device=self.DEVICE)
         self.model.head.classification_head.num_classes = num_classes
         self.model.load_state_dict(torch.load(MODEL_PATH, map_location=self.DEVICE))
         self.model.to(self.DEVICE)
         self.model.eval()
 
-        # ========================
+        # --------------
         # TRASFORMAZIONE
-        # ========================
+        # --------------
         self.transform = T.Compose([
             T.ToPILImage(),
             T.Resize((300, 300)),
@@ -51,32 +51,41 @@ class InferenceFunction:
 
 
     def predict(self, frame):
+        # Estraggo altezza e larghezza del frame
         height, width = frame.shape[:2]
 
+        # Calcolo lo scale, per applicarlo poi ai bbox (Essendo il frame convertito in 300x300)
         scale_x = width / 300
         scale_y = height / 300
 
+        # Acquisisco il timestamp in secondi (per calcolo inference time)
         t0 = time.time()
+        # Applico trasformazione al frame
         input_tensor = self.transform(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)).unsqueeze(0).to(self.DEVICE)
 
+        # Eseguo inferenza
         with torch.no_grad():
             outputs = self.model(input_tensor)[0]
 
+        # Calcolo Inference Time
         infer_time = (time.time() - t0) * 1000.0  # ms
 
+        # Estraggo e converto Output di inferenza
         boxes = outputs['boxes'].cpu().numpy()
         scores = outputs['scores'].cpu().numpy()
         labels = outputs['labels'].cpu().numpy()
 
         # Filtra detection con confidence alta
         mask = scores >= self.CONF_THRESHOLD
+
+        # Mantengo solo gli output che soddisfano la condizione di soglia
         boxes = boxes[mask]
         scores = scores[mask]
         labels = labels[mask]
 
-        # ------------------
+        # ----------------
         # COSTRUZIONE JSON
-        # ------------------
+        # ----------------
         frame_annotations = {
             "inference_time_ms": infer_time,
             "objects": []
@@ -90,8 +99,10 @@ class InferenceFunction:
             x2 = int(box[2] * scale_x)
             y2 = int(box[3] * scale_y)
 
+            # Converto la classe da ID a Nome
             class_name = self.HOME_CLASSES[int(label)]
 
+            # Append della nuova predizione
             frame_annotations["objects"].append({
                 "class_name": class_name,
                 "score": float(score),

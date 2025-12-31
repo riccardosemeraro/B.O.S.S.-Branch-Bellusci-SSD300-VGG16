@@ -10,18 +10,20 @@ import cv2
 from pathlib import Path
 SCRIPT_DIR = Path(__file__).parent.parent
 
-# ========================
+# ------------------------
 # IMPORT SCRIPT INFERENZA
-# ========================
+# ------------------------
 from inference.inference_function import InferenceFunction
 inference_function = InferenceFunction()
 
+# Funzione eseguita quando si connette a MQTT
 def on_connect(client, userdata, flags, rc, properties):
     print("Connesso al broker con codice", rc)
     client.subscribe(TOPIC_FRAME)
 
-
+# Funzione eseguita quando riceve un messaggio da MQTT
 def on_message(client, userdata, msg):
+    # Conversione da bytes a frame cv2 (ovvero numpy)
     nparr = np.frombuffer(msg.payload, np.uint8)
     frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
@@ -31,9 +33,15 @@ def on_message(client, userdata, msg):
     # Pubblica le annotazioni sul topic delle predizioni
     client.publish(TOPIC_PRED, payload=json.dumps(frame_annotations), qos=1, retain=False)
 
+# ------------
+# MQTT SERVER
+# ------------
 client = mqtt.Client(callback_api_version=mqtt.CallbackAPIVersion.VERSION2)
 client.on_connect = on_connect
 client.on_message = on_message
 
+# --------------------------
+# CONNESSIONE AL BROKER MQTT
+# --------------------------
 client.connect(BROKER_CONTAINER, BROKER_PORT, keepalive=60)
 client.loop_forever()
