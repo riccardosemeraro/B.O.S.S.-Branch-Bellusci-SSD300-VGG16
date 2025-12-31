@@ -23,7 +23,6 @@ class InferenceFunction:
         # CARICAMENTO CLASSI
         # ------------------
 
-        # Load Annotations File Created
         with open(SCRIPT_DIR / "inference/home_classes.json", "r") as f:
             self.HOME_CLASSES = json.load(f)
 
