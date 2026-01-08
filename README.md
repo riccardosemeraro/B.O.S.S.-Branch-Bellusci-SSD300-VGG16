@@ -486,9 +486,9 @@ flowchart LR
 
 - [x] **OpenCV**: Elaborazione immagini/video, GUI minimale
 
-- [x] **MQTT (Mosquitto)**: Comunicazione distribuita
+- [x] **MQTT (Mosquitto)**: Comunicazione distribuita, broker
 
-- [x] **Paho-MQTT**: Libreria Python MQTT
+- [x] **Paho-MQTT**: Libreria Python MQTT per Client e Server
 
 - [x] **Docker & Compose**: Containerizzazione
 
@@ -496,8 +496,30 @@ flowchart LR
 
 - [x] **COCO Dataset**: Dataset di training
 
-- [ ] **GPU NVIDIA**: Accelerazione CUDA (opzionale)
+- [x] **GPU NVIDIA**: Accelerazione CUDA (usata su Google Colab)
 
 ---
 
-*Creato con ❤️ per rendere il mondo più accessibile attraverso la tecnologia AI.*
+```mermaid
+gantt
+    title Gantt
+    dateFormat  YYYY-MM-DD
+    axisFormat %d/%m/%y
+    todayMarker off
+    
+    section Introduction
+        Ricerca : a1, 2025-10-10, 15d
+        Addestramento AI: a2, after a1, 30d
+    
+    section Testing
+        MQTT : p1, after a2, 5d
+        Tkinter GUI : p2, after a2, 8d
+        OpenCV GUI : p3, after p2, 5d
+        Object Detection: p4, after p3, 10d
+        Sort: p5, after p4, 5d
+    
+    section Beta Release
+        Unify Sistem : b1, after p5, 15d
+        Documentation: after b1, 10d
+    
+```
