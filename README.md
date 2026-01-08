@@ -513,8 +513,8 @@ gantt
     
     section Testing
         MQTT : p1, after a2, 5d
-        Tkinter GUI : p2, after a2, 8d
-        OpenCV GUI : p3, after p2, 5d
+        Tkinter GUI : p2, after a2, 7d
+        OpenCV GUI : p3, after p2, 7d
         Object Detection: p4, after p3, 10d
         Sort: p5, after p4, 5d
     
