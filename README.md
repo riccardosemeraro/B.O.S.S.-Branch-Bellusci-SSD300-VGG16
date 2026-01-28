@@ -38,6 +38,8 @@ Questo progetto implementa una rete neurale **SSD300** basata su **VGG16** per i
 
 - [🐳 Docker Deployment](#-docker-deployment)
 
+- [📋 FURPS+](#-furps)
+
 - [📐 Diagrammi UML](#-diagrammi-uml)
 
 - [✅ CheckList Tecnologie Coinvolte](#-checklist-tecnologie-coinvolte)
@@ -326,6 +328,75 @@ Per l'inferenze eseguita dal server, invece, si ricorre alla CPU APPLE SILICON M
 
 ---
 
+## 📋 FURPS+
+
+  
+
+### Funzionali (Functional)
+
+-  **Rilevamento Oggetti**: Il sistema deve identificare oggetti domestici con accuratezza >50%
+
+-  **Classificazione**: Assegnare classi corrette agli oggetti rilevati
+
+-  **Bounding Boxes**: Fornire coordinate precise delle bounding boxes
+
+-  **Real-time Processing**: Elaborare immagini
+
+  
+
+### Usabilità (Usability)
+
+-  **Interfaccia Semplice**: GUI minimale accessibile per utenti con disabilità visive
+
+-  **Feedback Visivo**: Overlay di bounding boxes chiare e leggibili
+
+  
+
+### Affidabilità (Reliability)
+
+-  **Disponibilità**: Garantire la disponibilità del servizio
+
+-  **Robustezza**: Gestione errori di rete e perdita connessione MQTT
+
+-  **Accuratezza**: Mantenimento performance su dataset variati
+
+  
+
+### Performance (Performance)
+
+-  **Velocità Inference**: <300ms per immagine 300x300
+
+-  **Throughput**: Molto elevato
+
+-  **Scalabilità**: Possibilità di scaling orizzontale con più server
+
+  
+
+### Supportabilità (Supportability)
+
+-  **Manutenibilità**: Codice modulare e ben documentato
+
+-  **Testabilità**: Suite di test completa per tutti i componenti
+
+-  **Configurabilità**: Parametri regolabili via file di configurazione
+
+-  **Monitoraggio**: Logging dettagliato per debugging
+
+-  **Portabilità**: Supportato da diversi dispositivi grazie ai container
+
+  
+
+### + (Sicurezza, Privacy, etc.)
+
+-  **Sicurezza**: Autenticazione MQTT opzionale
+
+-  **Privacy**: Nessun storage permanente di immagini utente
+
+-  **Compliance**: Adesione a GDPR per dati personali
+
+
+---
+
 ## 📐 Diagrammi UML
 
 
@@ -514,6 +585,14 @@ gantt
     
     section Beta Release
         Unify Sistem : b1, after p1, 15d
-        Documentation: after b1, 10d
+        Documentation: after b1, 12d
     
 ```
+
+---
+
+---
+
+  
+
+*Creato con ❤️ per rendere il mondo più accessibile.*
