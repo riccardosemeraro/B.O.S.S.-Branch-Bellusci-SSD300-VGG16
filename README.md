@@ -41,6 +41,8 @@ Questo progetto implementa una rete neurale **SSD300** basata su **VGG16** per i
 - [📐 Diagrammi UML](#-diagrammi-uml)
 
 - [✅ CheckList Tecnologie Coinvolte](#-checklist-tecnologie-coinvolte)
+
+- [⏱️ Diagramma di Gantt](#-diagramma-di-gantt)
   
 
 ---
@@ -199,6 +201,9 @@ Vuoi provare B.O.S.S. in 5 minuti? 🚀
 
 
 ```bash
+# N.B. Per esecuzione su MacOS, richiede XQuartz, dopo l'installazione
+# Per abilitare Connessioni client Apri XQuartz -> Impostazioni -> Protezione -> Consenti le Connessioni da Client Network
+xhost +localhost
 
 # 1. Clona la repository
 
@@ -206,13 +211,8 @@ git  clone  https://github.com/riccardosemeraro/B.O.S.S.-SSD300-VGG16.git
 
 cd  B.O.S.S.-SSD300-VGG16
 
-  
-
 # 2. Build e Avvio tutto con Docker
-
 docker-compose up --build
-
-# N.B. Per esecuzione su MacOS, richiede XQuartz
 ```
 
 Il sistema sarà attivo utilizzando 3 container (`server`, `client`, `mqtt_broker`).
@@ -359,7 +359,7 @@ Modello SSD->>Server: Restituisce predizioni
 
 Server->>Broker MQTT: Pubblica risultati su 'smartglasses/pred'
 
-Broker MQTT->>Client: Inoltra detections
+Broker MQTT->>Client: Inoltra predizioni
 
 Client->>Utente: Visualizza bounding boxes
 
@@ -484,13 +484,15 @@ flowchart LR
 
 - [x] **Paho-MQTT**: Libreria Python MQTT per Client e Server
 
-- [x] **Docker & Compose**: Containerizzazione
+- [x] **Docker & Docker Compose**: Containerizzazione
 
 - [x] **COCO Dataset**: Dataset di training
 
 - [x] **GPU NVIDIA**: Accelerazione CUDA (usata su Google Colab)
 
 ---
+
+## ⏱️ Diagramma di Gantt
 
 ```mermaid
 gantt
@@ -504,14 +506,14 @@ gantt
         Addestramento AI: a2, after a1, 30d
     
     section Testing
-        MQTT : p1, after a2, 5d
-        Tkinter GUI : p2, after a2, 7d
-        OpenCV GUI : p3, after p2, 7d
-        Object Detection: p4, after p3, 10d
+        Object Detection: p4, after a2, 10d
         Sort: p5, after p4, 5d
+        Tkinter GUI : p2, after p5, 7d
+        OpenCV GUI : p3, after p2, 7d
+        MQTT : p1, after p3, 5d
     
     section Beta Release
-        Unify Sistem : b1, after p5, 15d
+        Unify Sistem : b1, after p1, 15d
         Documentation: after b1, 10d
     
 ```
