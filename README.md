@@ -13,7 +13,7 @@
 [![COCO](https://img.shields.io/badge/COCO-Home%20Object-purple.svg?logo=roboflow)](https://universe.roboflow.com/objectdetection-uzld5/coco-home-objects)
 
 
-Questo progetto implementa una rete neurale **SSD300** basata su **VGG16** per il rilevamento di oggetti, integrata in un'architettura publisher-subscriber distribuita con comunicazione MQTT, coadiuvata da una GUI minimale su SmartGlasses Emulati.
+Questo progetto implementa una rete neurale **SSD300** basata su **VGG16** per il rilevamento di oggetti, integrata in un'architettura publisher-subscriber distribuita con comunicazione MQTT, coadiuvata da una GUI minimale su SmartGlasses Emulati. Obiettivo ultimo è assistere alla navigazioni utenti con limitazioni visive.
   
 
 ---
@@ -77,7 +77,7 @@ Il progetto **B.O.S.S.** mira a sviluppare un sistema di assistenza visiva basat
 
 -  🧠 **PyTorch**: Framework per il deep learning, utilizzato per l'implementazione e l'addestramento del modello SSD300
 
--  👁 **TorchVision**: Libreria per computer vision, fornisce il backbone VGG16 pre-addestrato
+-  👁 **TorchVision**: Libreria per computer vision, fornisce il modello SSD300 con backbone VGG16 pre-addestrato
 
 -  📸 **OpenCV**: Per l'elaborazione di immagini e video, cattura da webcam e preprocessing
 
@@ -141,9 +141,9 @@ SmartGlasses --> |"7. FRAME + BBOX"| Client
 
 #### 1. 🧠 **Modello SSD300-VGG16** 
 
--  **Single Shot MultiBox Detector (SSD)**: Architettura one-stage per object detection, fornendo in un solo passaggio sia le coordinate spaziali sia la classificazione
+-  **Single Shot MultiBox Detector (SSD)**: Architettura one-stage per object detection, fornisce in un solo passaggio di rete neurale sia le coordinate spaziali sia la classificazione degli oggetti riconosciuti
 
--  **VGG16 Backbone**: Rete convoluzionale pre-addestrata su ImageNet per feature extraction
+-  **VGG16 Backbone**: Rete convoluzionale pre-addestrata
 
 -  **300x300 Input**: Risoluzione ottimale per velocità/inferenza bilanciata
 
@@ -159,7 +159,7 @@ SmartGlasses --> |"7. FRAME + BBOX"| Client
 
 - **Inferenza**: passaggio attraverso il modello SSD
 
-- **Post-processing**: NMS (Non-Maximum Suppression), thresholding
+- **Post-processing**: thresholding delle predizioni
 
 - **Output**: JSON con detections (bbox, class, confidence)
 
@@ -213,9 +213,6 @@ cd  B.O.S.S.-SSD300-VGG16
 docker-compose up --build
 
 # N.B. Per esecuzione su MacOS, richiede XQuartz
-
-# 3. Guarda la magia! 🎉
-
 ```
 
 Il sistema sarà attivo utilizzando 3 container (`server`, `client`, `mqtt_broker`).
@@ -302,7 +299,7 @@ Jupyter Notebook in training/jupyter Google Colab
 
 ### Struttura Container
 
--  **server**: Servizio inference con GPU support
+-  **server**: Servizio inference
 
 -  **client**: GUI client con Tkinter
 
@@ -352,15 +349,15 @@ participant Modello SSD
 
 Utente->>Client: Cattura immagine
 
-Client->>Broker MQTT: Pubblica immagine su 'boss/image'
+Client->>Broker MQTT: Pubblica immagine su 'smartglasses/frame'
 
 Broker MQTT->>Server: Inoltra immagine
 
 Server->>Modello SSD: Esegue inference
 
-Modello SSD->>Server: Restituisce detections
+Modello SSD->>Server: Restituisce predizioni
 
-Server->>Broker MQTT: Pubblica risultati su 'boss/detections'
+Server->>Broker MQTT: Pubblica risultati su 'smartglasses/pred'
 
 Broker MQTT->>Client: Inoltra detections
 
@@ -375,7 +372,7 @@ Client->>Utente: Visualizza bounding boxes
 ```mermaid
 classDiagram
 
-class ClientGUI {
+class Client {
 
 -webcam
 
@@ -391,9 +388,9 @@ class ClientGUI {
 
   
 
-class MQTTClient {
+class MQTT{
 
--broker_addr
+-broker_address
 
 -topics
 
@@ -405,19 +402,11 @@ class MQTTClient {
 
 }
 
-  
+class Server {
 
-class InferenceEngine {
+-GPU
 
--model_path
-
--threshold
-
-+load_model()
-
-+preprocess()
-
-+postprocess()
++send_inference()
 
 }
 
@@ -427,9 +416,11 @@ class SSDModel {
 
 -backbone
 
+-weights
+
 -layers
 
-+forward()
++train()
 
 +predict()
 
@@ -437,9 +428,11 @@ class SSDModel {
 
   
 
-ClientGUI --> MQTTClient : usa
+Client --> MQTT : usa
 
-InferenceEngine --> SSDModel : carica
+Server --> MQTT : usa
+
+Server --> SSDModel : carica
 ```
 
   
@@ -454,19 +447,20 @@ flowchart LR
   System[Sistema B.O.S.S.]
 
   UC1([Cattura immagine])
-  UC2([Invia al server])
-  UC3([Ricevi rilevamenti])
-  UC4([Visualizza oggetti])
+  UC2([Invia al sistema B.O.S.S.])
+  UC3([Visualizza Risultato])
 
-  UC5([Elabora immagine])
-  UC6([Rileva oggetti])
-  UC7([Invia risultati])
+  UC5([Carica modello])
+  UC6([Elabora immagine ricevuta])
+  UC7([Effettua inferenza])
+  UC8([Invia risultati])
 
-  User --> UC1 --> UC2 --> UC3 --> UC4
-  System --> UC5 --> UC6 --> UC7
+  User --> UC1 --> UC2 --> UC3
+  System --> UC5 --> UC6 --> UC7 --> UC8
   Admin --> A1([Addestra modello])
   Admin --> A2([Monitora sistema])
   Admin --> A3([Aggiorna dataset])
+  Admin --> A4([Raccoglie Feedback])
 ```
 
 
@@ -482,7 +476,7 @@ flowchart LR
 
 - [x] **PyTorch 2.8**: Framework deep learning
 
-- [x] **TorchVision**: Backbone VGG16 e utilities
+- [x] **TorchVision**: Modello SSD300 con Backbone VGG16 e utilities
 
 - [x] **OpenCV**: Elaborazione immagini/video, GUI minimale
 
@@ -491,8 +485,6 @@ flowchart LR
 - [x] **Paho-MQTT**: Libreria Python MQTT per Client e Server
 
 - [x] **Docker & Compose**: Containerizzazione
-
-- [x] **NumPy & Pillow**: Manipolazione dati
 
 - [x] **COCO Dataset**: Dataset di training
 

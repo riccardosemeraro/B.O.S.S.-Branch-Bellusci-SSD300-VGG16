@@ -32,16 +32,16 @@ def draw_boxes_from_json(frame, data):
         y2 = int(bbox["y2"])
 
         # Disegno il rettangolo
-        cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+        cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 5)
         # Scrivo la classe sopra il rettangolo
         cv2.putText(
             frame,
             f"{class_name} {score:.2f}",
             (x1, max(y1 - 10, 0)),
             cv2.FONT_HERSHEY_SIMPLEX,
-            0.8,
+            1.6,
             (0, 255, 0),
-            2,
+            3,
         )
 
     return frame
