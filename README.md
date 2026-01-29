@@ -517,28 +517,28 @@ Admin --> A4([Collect Feedback])
 
 ## ⏱️ Gantt Chart
 
-````mermaid
-gantt 
-title Gantt 
-dateFormat YYYY-MM-DD 
-axisFormat %d/%m/%y 
-todayMarker off 
-
-section Introduction 
-Research : a1, 2025-10-10, 15d 
-AI training: a2, after a1, 30d 
-
-sectionTesting 
-Object Detection: p4, after a2, 10d 
-Sort: p5, after p4, 5d 
-Tkinter GUI : p2, after p5, 7d 
-OpenCV GUI : p3, after p2, 7d 
-MQTT : p1, after p3, 5d 
-
-section Beta Release 
-Unify System : b1, after p1, 15d 
-Documentation: after b1, 12d
-
+```mermaid
+gantt
+    title Gantt
+    dateFormat  YYYY-MM-DD
+    axisFormat %d/%m/%y
+    todayMarker off
+    
+    section Introduction
+        Research : a1, 2025-10-10, 15d
+        Training AI: a2, after a1, 30d
+    
+    section Testing
+        Object Detection: p4, after a2, 10d
+        Sort: p5, after p4, 5d
+        Tkinter GUI : p2, after p5, 7d
+        OpenCV GUI : p3, after p2, 7d
+        MQTT : p1, after p3, 5d
+    
+    section Beta Release
+        Unify Sistem : b1, after p1, 15d
+        Documentation: after b1, 12d
+    
 ```
 
 ---
