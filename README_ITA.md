@@ -32,6 +32,8 @@ Questo progetto implementa una rete neurale **SSD300** basata su **VGG16** per i
 
 - [⚡ Quickstart](#-quickstart)
 
+- [📦 Installazione Locale](#-installazione-locale)
+
 - [🧠 Training del Modello](#-training-del-modello)
 
 - [📡 API MQTT](#-api-mqtt)

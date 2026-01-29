@@ -11,7 +11,7 @@
 [![COCO](https://img.shields.io/badge/COCO-Home%20Object-purple.svg?logo=roboflow)](https://universe.roboflow.com/objectdetection-uzld5/coco-home-objects)
 
 
-This project implements a **SSD300** neural network based on **VGG16** for object detection, integrated into a distributed publisher-subscriber architecture with MQTT communication, supported by a minimal GUI on emulated SmartGlasses. The ultimate objective is to assist users with visual limitations in navigating.
+This project implements a **SSD300** neural network based on **VGG16** for object detection, integrated into a distributed publisher-subscriber architecture with MQTT communication, supported by a minimal GUI on Emulated SmartGlasses. The ultimate goal is to assist users with visual impairments in navigation.
   
 
 ---
@@ -24,15 +24,17 @@ This project implements a **SSD300** neural network based on **VGG16** for objec
 
 - [🛠️ Technologies Used](#-technologies-used)
 
-- [🏗️ Architecture of the Ideal System](#-architecture-of-the-ideal-system)
+- [🏗️ Ideal System Architecture](#-ideal-system-architecture)
 
-- [🏗️ System Architecture Emulating SmartGlasses](#-architecture-of-the-system-emulating-smartglasses)
+- [🏗️ System Architecture Emulating SmartGlasses](#-system-architecture-emulating-smartglasses)
 
 - [⚡ Quickstart](#-quickstart)
 
+- [📦 Local Installation](#-local-installation)
+
 - [🧠 Model Training](#-model-training)
 
-- [📡 MQTT API](#-api-mqtt)
+- [📡 MQTT API](#-mqtt-api)
 
 - [🐳 Docker Deployment](#-docker-deployment)
 
@@ -40,7 +42,7 @@ This project implements a **SSD300** neural network based on **VGG16** for objec
 
 - [📐 UML Diagrams](#-uml-diagrams)
 
-- [✅ Involved Technologies CheckList](#-involved-technologies-checklist)
+- [✅ Involved Technologies Checklist](#-involved-technologies-checklist)
 
 - [⏱️ Gantt Chart](#-gantt-chart)
   
@@ -49,11 +51,11 @@ This project implements a **SSD300** neural network based on **VGG16** for objec
 
   
 
-## 🎯 Objective
+## 🎯 Goal
 
   
 
-The **B.O.S.S.** project aims to develop an artificial intelligence-based visual assistance system to support people with visual impairments using smart eyeglasses. Using advanced Computer Vision techniques, the system detects and classifies household objects in real time, providing video feedback for safe navigation.
+The **B.O.S.S.** project aims to develop an AI-based visual assistance system to support people with visual impairments using smart glasses. Using advanced computer vision techniques, the system detects and classifies household objects in real time, providing video feedback for safe navigation.
 
   
 
@@ -61,13 +63,13 @@ The **B.O.S.S.** project aims to develop an artificial intelligence-based visual
 
 - 🎥 Real-time object detection
 
-- 📱 Minimal UI for wearable devices (AKA Smart Glasses)
+- 📱 Minimal user interface for wearable devices (AKA smart glasses)
 
 - 🔄 Asynchronous communication via MQTT
 
-- 🐳 Complete containerization with Docker
+- 🐳 Full containerization with Docker
 
-- ⚡ Optimized inference on GPU and CPU
+- ⚡ Optimized inference on GPUs and CPUs
 
 
 ---
@@ -79,45 +81,39 @@ The **B.O.S.S.** project aims to develop an artificial intelligence-based visual
 
 - 🧠 **PyTorch**: Deep learning framework, used for implementing and training the SSD300 model
 
-- 👁 **TorchVision**: Computer vision library, provides SSD300 model with pre-trained VGG16 backbone
+- 👁 **TorchVision**: Computer vision library, provides the SSD300 model with a pre-trained VGG16 backbone
 
-- 📸 **OpenCV**: For image and video processing, webcam capture and preprocessing
-
-  
+- 📸 **OpenCV**: For image and video processing, webcam capture, and preprocessing
 
 ### Distributed Architecture
 
-- 📡 **MQTT (Mosquitto)**: Lightweight messaging protocol for communication based on the publisher/subscriber model
+- 📡 **MQTT (Mosquitto)**: Lightweight messaging protocol for publisher/subscriber communication
 
 - 🐳 **Docker & Docker Compose**: Containerization for scalable and portable deployment
 
-  
-
 ### Development and Deployment
 
-- 🐍 **Python 3.13**: Main language for all components
+- 🐍 **Python 3.13**: Core language for all components
 
-- 🔢 **NumPy & Pillow**: Array and image manipulation
+- 🔢 **NumPy & Pillow**: Array and Image Manipulation
 
-- 📨 **Paho-MQTT**: Python library for MQTT
+- 📨 **Paho-MQTT**: Python Library for MQTT
 
-  
-
-### Datasets
+### Dataset
 
 - 🏠 **COCO-Home-Objects**: Expanded COCO-based dataset for common household objects
 
 ---
 
 
-## 🏗️ Architecture of the Ideal System
+## 🏗️ Ideal System Architecture
 
 
 ```mermaid
 flowchart TB
 
 Client["SmartGlasses"] --> |"1. FRAME"| Broker["MQTT Broker"] --> |"2.FRAME"| Server["Server"] --> |"3.FRAME"| Inference["Model Inference"] --> |"4. BBOX"| Server --> |"5. BBOX"| Broker --> |"6. BBOX"| SmartGlasses["SmartGlasses GUI"]
-SmartGlasses --> |"7. BBOX"| Clients
+SmartGlasses --> |"7. BBOX"| Client
 
 ```
 
@@ -131,8 +127,8 @@ SmartGlasses --> |"7. BBOX"| Clients
 flowchart TB
 
 Client --> |"1. FRAME"| Broker["MQTT Broker"] --> |"2.FRAME"| Server["Server"] --> |"3.FRAME"| Inference["Model Inference"] --> |"4. BBOX"| Server --> |"5. BBOX"| Broker --> |"6. BBOX"| SmartGlasses
-Client["Client"] --> |"1. FRAME"| SmartGlasses["SmartGlasses GUI"] --> |"2. FRAME"| Clients
-SmartGlasses --> |"7. FRAME + BBOX"| Clients
+Client["Client"] --> |"1. FRAME"| SmartGlasses["SmartGlasses GUI"] --> |"2. FRAME"| Client
+SmartGlasses --> |"7. FRAME + BBOX"| Client
 
 ```
 
@@ -140,34 +136,29 @@ SmartGlasses --> |"7. FRAME + BBOX"| Clients
 
 ### Detailed Components
 
+#### 1. 🧠 **SSD300-VGG16 Model**
 
-#### 1. 🧠 **Model SSD300-VGG16** 
-
-- **Single Shot MultiBox Detector (SSD)**: One-stage architecture for object detection, provides both the spatial coordinates and the classification of recognized objects in a single neural network pass
+- **Single Shot MultiBox Detector (SSD)**: One-stage architecture for object detection, provides both spatial coordinates and classification of recognized objects in a single neural network pass.
 
 - **VGG16 Backbone**: Pre-trained convolutional network
 
 - **300x300 Input**: Optimal resolution for balanced speed/inference
 
-- **Output**: Bounding boxes, classes and confidence scores for each detection
+- **Output**: Bounding boxes, classes, and confidence scores for each detection.
 
-  
+#### 2. 🔍 **Inference Service**
 
-#### 2. 🔍 **Inference Service** 
+- Receives images converted to bytes via **MQTT**
 
-- Receives images converted into bytes via **MQTT**
+- **Preprocessing**: Resize to 300x300, normalization
 
-- **Preprocessing**: resize to 300x300, normalization
+- **Inference**: Pass through the SSD model
 
-- **Inference**: Passing through the SSD model
-
-- **Post-processing**: thresholding of predictions
+- **Post-processing**: Threshold predictions
 
 - **Output**: JSON with detections (bbox, class, confidence)
 
-  
-
-#### 3. 👓 **Client Wearable**
+#### 3. 👓 **Wearable Client**
 
 - Simulation of **smart glasses**
 
@@ -175,43 +166,37 @@ SmartGlasses --> |"7. FRAME + BBOX"| Clients
 
 - Send to server via **MQTT**
 
-- **Result display**: bounding boxes overlay
+- **Results display**: Bounding box overlay
 
-
-
-#### 4. 📡 **MQTT Broker** 
+#### 4. 📡 **MQTT Broker**
 
 - **Mosquitto**: Lightweight and high-performance broker
 
-- **Topics**: 
-  - `smartglasses/frame` allows sending the frame, converted into bytes, to the inference server
-  - `smartglasses/pred` allows sending predictions, formulated in a JSON structure, to the wearable client
+- **Topics**:
+- `smartglasses/frame` allows sending the frame, converted into bytes, to the inference server
+- `smartglasses/pred` allows sending predictions, formulated in a JSON structure, to the wearable client
 
 - **QoS = 1**: Guarantees delivery at least once in the communication
 
-  
 ---
-
-  
 
 ## ⚡ Quickstart
 
-
-Do you want to try B.O.S.S. in 5 minutes? 🚀
+Want to try B.O.S.S. in 5 minutes? 🚀
 
 
 ```bash
-# N.B. To run on MacOS, requires XQuartz, after installation
-# To enable Client Connections Open XQuartz -> Settings -> Security -> Allow Connections from Client Network
+# N.B. To run on MacOS, it requires XQuartz after installation.
+# To enable Client Connections, open XQuartz -> Settings -> Security -> Allow Connections from Client Networks.
 xhost +localhost
 
-#1. Clone the repository
+# 1. Clone the repository
 
-git clone https://github.com/riccardosemeraro/B.O.S.S.-SSD300-VGG16.git
+git  clone  https://github.com/riccardosemeraro/B.O.S.S.-SSD300-VGG16.git
 
-cd B.O.S.S.-SSD300-VGG16
+cd  B.O.S.S.-SSD300-VGG16
 
-#2. Build and Launch everything with Docker
+#2. Build and Run Everything with Docker
 docker-compose up --build
 ```
 
@@ -221,7 +206,6 @@ The system will be active using 3 containers (`server`, `client`, `mqtt_broker`)
   
 
 ## 📦 Local Installation
-  
 
 ### Prerequisites
 
@@ -233,36 +217,33 @@ The system will be active using 3 containers (`server`, `client`, `mqtt_broker`)
 
 - CONDA
 
-
 ```bash
 
 # Create virtual environment
 conda create -p ./.venv python=3.13 pip
 
-# Enable virtual environment
+# Activate virtual environment
 conda activate ./.venv
 
 # Install dependencies
 pip install -r inference/requirements_inference.txt
 
-# Starting mqtt container
-# in this case change BROKER_CONTAINER="localhost" instead of "mqtt_broker" in broker/configuration.py
+# Start mqtt container
+# In this case, change BROKER_CONTAINER="localhost" instead of "mqtt_broker" in broker/configuration.py
 docker run -d --name mosquitto -p 1883:1883 eclipse-mosquitto
 
-# Starting server
+# Start server
 python3 server/server.py
 
-# Client startup
+# Start client
 python3 client/client.py
 ```
 
-  
-
-### Dataset configuration
+### Dataset Configuration
 
 ```bash
 
-# Download the COCO-Home-Objects dataset at the link 
+# Download the COCO-Home-Objects dataset at
 # https://universe.roboflow.com/objectdetection-uzld5/coco-home-objects
 # instructions in training/README_dataset.txt
 
@@ -279,23 +260,16 @@ Jupyter Notebook in training/jupyter Google Colab
 
 ## 📡 MQTT API
 
-  
-
 ### Topics
 
-  
-| Topics | Management | Payloads | Description |
-|------------------------| --------------- | -------------------- | ---------------------- |
+| Topic | Direction | Payload | Description |
+|-------------------| -------------- | -------------------- | ---------------------- |
 | smartglasses/frame | Client → Server | Base64 encoded image | Image to analyze |
-| smartglasses/pred | Server → Client | JSON detections | Detection Results |
-
+| smartglasses/pred | Server → Client | JSON detections | Detection results |
 
 ---
-  
 
 ## 🐳 Docker Deployment
-
-  
 
 ### Container Structure
 
@@ -304,13 +278,12 @@ Jupyter Notebook in training/jupyter Google Colab
 - **client**: GUI client with Tkinter
 
 - **mqtt_broker**: Mosquitto MQTT broker
-  
 
 ### Build and Run
 
 ```bash
 
-# Build and Start docker-compose
+# Build and Run docker-compose
 
 docker-compose up -d --build
 
@@ -318,17 +291,15 @@ docker-compose up -d --build
 
   
 
-### GPU configuration
+### GPU Configuration
 
-To train the model, GOOGLE COLAB was used, which provides the NVIDIA T4 GPU for a period of approximately 2/3 hours per day. Through checkpoint-based training, 100 epochs were performed, of which 20 on the "head" and 80 on the "body".
+For model training, we used GOOGLE COLAB, which provides the NVIDIA T4 GPU for approximately 2-3 hours per day. Checkpoint-based training was used to run 100 epochs, 20 on the "head" and 80 on the "body."
 
-For inferences performed by the server, however, we use the APPLE SILICON M\* CPU, optimized for single-threaded (non-parallel) inferences. 
+For server-side inference, we used the APPLE SILICON M* CPU, optimized for single-threaded (non-parallel) inference.
 
 ---
 
 ## 📋 FURPS+
-
-  
 
 ### Functional
 
@@ -336,39 +307,31 @@ For inferences performed by the server, however, we use the APPLE SILICON M\* CP
 
 - **Classification**: Assign correct classes to detected objects
 
-- **Bounding Boxes**: Provide precise coordinates of the bounding boxes
+- **Bounding Boxes**: Provide precise coordinates of bounding boxes
 
 - **Real-time Processing**: Process images
 
-  
-
 ### Usability
 
-- **Simple Interface**: Minimal GUI accessible for users with visual impairments
+- **Simple Interface**: Minimal GUI accessible to users with visual impairments
 
-- **Visual Feedback**: Overlay of clear and legible bounding boxes
-
-  
+- **Visual Feedback**: Clear and readable bounding box overlays
 
 ### Reliability
 
-- **Availability**: Guarantee the availability of the service
+- **Availability**: Ensure service availability
 
-- **Robustness**: Handling network errors and MQTT connection loss
+- **Robustness**: Handle network errors and MQTT connection loss
 
-- **Accuracy**: Maintenance of performance on varied datasets
-
-  
+- **Accuracy**: Maintain performance on varied datasets
 
 ### Performance
 
-- **Inference speed**: <300ms for 300x300 image
+- **Inference Speed**: <300ms for a 300x300 image
 
 - **Throughput**: Very high
 
-- **Scalability**: Possibility of horizontal scaling with multiple servers
-
-  
+- **Scalability**: Horizontal scaling possible with multiple servers
 
 ### Supportability
 
@@ -376,13 +339,11 @@ For inferences performed by the server, however, we use the APPLE SILICON M\* CP
 
 - **Testability**: Complete test suite for all components
 
-- **Configurability**: Parameters adjustable via configuration file
+- **Configurability**: Adjustable parameters via configuration file
 
 - **Monitoring**: Detailed logging for debugging
 
-- **Portability**: Supported by different devices thanks to containers
-
-  
+- **Portability**: Supported by multiple devices thanks to containers
 
 ### + (Security, Privacy, etc.)
 
@@ -390,13 +351,12 @@ For inferences performed by the server, however, we use the APPLE SILICON M\* CP
 
 - **Privacy**: No permanent storage of user images
 
-- **Compliance**: Adherence to GDPR for personal data
+- **Compliance**: GDPR compliance for personal data
 
 
 ---
 
-## 📐 UML diagrams
-
+## 📐 UML Diagrams
 
 ### Sequence Diagram
 
@@ -408,13 +368,11 @@ participant User
 
 participant Client
 
-participant Broker MQTT
+participant MQTT Broker
 
 participant Server
 
-participant SSD model
-
-  
+participant SSD Model
 
 User->>Client: Capture image
 
@@ -422,21 +380,19 @@ Client->>MQTT Broker: Publish image to 'smartglasses/frame'
 
 MQTT Broker->>Server: Forward image
 
-Server->>SSD Model: Run inference
+Server->>SSD Model: Perform inference
 
-SSD->>Server Model: Returns predictions
+SSD Model->>Server: Return predictions
 
 Server->>MQTT Broker: Publish results to 'smartglasses/pred'
 
 MQTT Broker->>Client: Forward predictions
 
-Client->>User: View bounding boxes
+Client->>User: Display bounding boxes
 
 ```
 
-  
-
-### Class Diagram
+### Sequence Diagram Classes
 
 ```mermaid
 classDiagram
@@ -455,7 +411,7 @@ class Client {
 
 }
 
-  
+
 
 class MQTT{
 
@@ -479,7 +435,7 @@ class Server {
 
 }
 
-  
+
 
 class SSDModel {
 
@@ -495,7 +451,7 @@ class SSDModel {
 
 }
 
-  
+
 
 Client --> MQTT : use
 
@@ -504,32 +460,32 @@ Server --> MQTT : use
 Server --> SSDModel : load
 ```
 
-  
+
 
 ### Use Case Diagram
 
 ```mermaid
 
-flowchart LR
-  User[Blind user]
-  Admin[Administrator]
-  System[B.O.S.S. System]
+flowchart LR 
+User[Blind user] 
+Admin[Administrator] 
+System[System B.O.S.S.]
 
-  UC1([Image Capture])
-  UC2([Send to B.O.S.S. system])
-  UC3([Display Result])
+UC1([Capture Image])
+UC2([Send to B.O.S.S. System])
+UC3([View Results])
 
-  UC5([Load Model])
-  UC6([Process received image])
-  UC7([Make inference])
-  UC8([Send Results])
+UC5([Load Model])
+UC6([Process Received Image])
+UC7([Perform Inference])
+UC8([Send Results])
 
-  User --> UC1 --> UC2 --> UC3
-  System --> UC5 --> UC6 --> UC7 --> UC8
-  Admin --> A1([Train Model])
-  Admin --> A2([Monitor system])
-  Admin --> A3([Update dataset])
-  Admin --> A4([Collect Feedback])
+User --> UC1 --> UC2 --> UC3
+System --> UC5 --> UC6 --> UC7 --> UC8
+Admin --> A1([Train Model])
+Admin --> A2([Monitor System])
+Admin --> A3([Update Dataset])
+Admin --> A4([Collect Feedback])
 ```
 
 
@@ -537,44 +493,42 @@ flowchart LR
 
   
 
-## ✅ CheckList Technologies Involved
+## ✅ Checklist of Involved Technologies
 
-  
+- [x] **Python 3.13**: Core Language
 
-- [x] **Python 3.13**: Main language
+- [x] **PyTorch 2.8**: Deep Learning Framework
 
-- [x] **PyTorch 2.8**: Deep learning framework
+- [x] **TorchVision**: SSD300 Model with VGG16 Backbone and Utilities
 
-- [x] **TorchVision**: SSD300 model with VGG16 Backbone and utilities
+- [x] **OpenCV**: Image/Video Processing, Minimal GUI
 
-- [x] **OpenCV**: Image/video processing, minimal GUI
+- [x] **MQTT (Mosquitto)**: Distributed Communication, Broker
 
-- [x] **MQTT (Mosquitto)**: Distributed communication, broker
-
-- [x] **Paho-MQTT**: Python MQTT library for Clients and Servers
+- [x] **Paho-MQTT**: Python MQTT Library for Client and Server
 
 - [x] **Docker & Docker Compose**: Containerization
 
-- [x] **COCO Dataset**: Training dataset
+- [x] **COCO Dataset**: Training Dataset
 
-- [x] **NVIDIA GPU**: CUDA acceleration (used on Google Colab)
+- [x] **NVIDIA GPU**: CUDA Acceleration (used on Google Colab)
 
 ---
 
-## ⏱️ Gantt chart
+## ⏱️ Gantt Chart
 
 ```mermaid
 gantt
     title Gantt
-    dateFormat YYYY-MM-DD
+    dateFormat  YYYY-MM-DD
     axisFormat %d/%m/%y
     todayMarker off
     
     section Introduction
-        Research : a1, 2025-10-10, 15d
-        AI training: a2, after a1, 30d
+        Ricerca : a1, 2025-10-10, 15d
+        Addestramento AI: a2, after a1, 30d
     
-    sectionTesting
+    section Testing
         Object Detection: p4, after a2, 10d
         Sort: p5, after p4, 5d
         Tkinter GUI : p2, after p5, 7d
@@ -582,7 +536,7 @@ gantt
         MQTT : p1, after p3, 5d
     
     section Beta Release
-        Unify System : b1, after p1, 15d
+        Unify Sistem : b1, after p1, 15d
         Documentation: after b1, 12d
     
 ```
